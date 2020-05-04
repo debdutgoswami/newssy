@@ -11,7 +11,7 @@ def convertToBinaryData(filepath):
     return blobData
 
 
-def addToNews(country: str, title: str, body: str):
+def addToNews(country: str, title: str, body: str, source: str, lastupdated: str):
     try:
         PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
         sqliteConnection = sqlite3.connect(PATH_TO_DB)
@@ -19,9 +19,9 @@ def addToNews(country: str, title: str, body: str):
         print("Connected to SQLite")
 
         insert_news_query = """INSERT INTO news
-                            (public_id, country, title, body) VALUES (?, ?, ?, ?)"""
+                            (public_id, country, title, body, source, lastupdated) VALUES (?, ?, ?, ?, ?, ?)"""
 
-        data_tuple = (str(uuid.uuid4()), country, title, body)
+        data_tuple = (str(uuid.uuid4()), country, title, body, source, lastupdated)
 
         cursor.execute(insert_news_query, data_tuple)
 
