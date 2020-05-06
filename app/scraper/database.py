@@ -1,39 +1,39 @@
-import sqlite3
-#from scraper import sqliteConnection
+import sqlalchemy, os, uuid
+from sqlalchemy import create_engine, Column, Integer, String, REAL, Table, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-import sqlite3, os, uuid
+PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
 
-def convertToBinaryData(filepath):
-    # convert digital data to Blob
-    with open(filepath, 'rb') as file:
-        blobData = file.read()
+engine = create_engine(f'sqlite:///database/newsfeed.db',echo=True)
+Session = sessionmaker(bind=engine)
+# metadata = MetaData()
+Base = declarative_base()
 
-    return blobData
+class News(Base):
+    __tablename__ = 'news'
+
+    id = Column(Integer, primary_key=True)
+    public_id = Column(String, unique=True, nullable=False)
+    country = Column(String, nullable=False)
+    title = Column(String, unique=True, nullable=False)
+    body = Column(String, unique=True, nullable=False)
+    source = Column(String, nullable=False)
+    lastupdated = Column(String, nullable=False)
+    category = Column(String)
+    accuracy = Column(REAL)
+
+    def __repr__(self):
+        return f"<News(title={self.title}, source={self.source}, lastupdated={self.lastupdated})>"
+
+#news = Table('news', metadata, autoload=True, autoload_with=engine)
 
 
 def addToNews(country: str, title: str, body: str, source: str, lastupdated: str):
+    session = Session()
     try:
-        PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
-        sqliteConnection = sqlite3.connect(PATH_TO_DB)
-        cursor = sqliteConnection.cursor()
-        print("Connected to SQLite")
-
-        insert_news_query = """INSERT INTO news
-                            (public_id, country, title, body, source, lastupdated) VALUES (?, ?, ?, ?, ?, ?)"""
-
-        data_tuple = (str(uuid.uuid4()), country, title, body, source, lastupdated)
-
-        cursor.execute(insert_news_query, data_tuple)
-
-        sqliteConnection.commit()
-
-        cursor.close()
-
-        return 200
-    except sqlite3.Error as error:
-        print("Failed to insert blob data into sqlite table", error)
-    finally:
-        if (sqliteConnection):
-            sqliteConnection.close()
-            return 400
-        return 404
+        news = News(public_id=str(uuid.uuid4()), country=country, title=title, body=body, source=source, lastupdated=lastupdated)
+        session.add(news)
+        session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        return

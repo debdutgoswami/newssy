@@ -6,7 +6,8 @@ except ModuleNotFoundError:
     from database import addToNews
 
 def scraper_timesofindia():
-    url = 'https://timesofindia.indiatimes.com'
+    BASE = 'https://timesofindia.indiatimes.com'
+    url = 'https://timesofindia.indiatimes.com/news'
 
     s = requests.Session()
 
@@ -20,11 +21,14 @@ def scraper_timesofindia():
 
         try:
             url_new = tmp['href']
+        except KeyError:
+            url_new = None
         except TypeError:
             url_new = None
 
         if url_new and url_new.startswith('/') and url_new.endswith('.cms'):
-            final = url+url_new
+            final = BASE+url_new
+
             with s.get(final, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
                 country = url_new.split('/')[1]
 
@@ -87,5 +91,5 @@ def scraper_bbc():
                     continue
 
 if __name__ == "__main__":
-    scraper_bbc()
+    scraper_timesofindia()
 
