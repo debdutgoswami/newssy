@@ -1,11 +1,12 @@
 import sqlalchemy, os, uuid
-from sqlalchemy import create_engine, Column, Integer, String, REAL, Table, MetaData
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import BYTEA, REAL
 from sqlalchemy.orm import sessionmaker
 
 PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
 
-engine = create_engine(f'sqlite:///database/newsfeed.db',echo=True)
+engine = create_engine("postgresql://postgres:12345@localhost:5432/newsfeed",echo=True)
 Session = sessionmaker(bind=engine)
 # metadata = MetaData()
 Base = declarative_base()
@@ -16,8 +17,8 @@ class News(Base):
     id = Column(Integer, primary_key=True)
     public_id = Column(String, unique=True, nullable=False)
     country = Column(String, nullable=False)
-    title = Column(String, unique=True, nullable=False)
-    body = Column(String, unique=True, nullable=False)
+    title = Column(BYTEA, unique=True, nullable=False)
+    body = Column(BYTEA, nullable=False)
     source = Column(String, nullable=False)
     lastupdated = Column(String, nullable=False)
     category = Column(String)
