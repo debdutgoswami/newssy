@@ -1,7 +1,7 @@
 import sqlalchemy, os, uuid
-from sqlalchemy import create_engine, Column, Integer, String, REAL, Table, MetaData
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.dialects.postgresql import BYTEA
+from sqlalchemy.dialects.postgresql import BYTEA, REAL
 from sqlalchemy.orm import sessionmaker
 
 PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
