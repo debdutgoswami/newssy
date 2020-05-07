@@ -13,7 +13,7 @@ class User(db.Model):
     password = db.Column(db.String)
     joined_on =db.Column(db.String)
     admin = db.Column(db.Boolean)
-    preferences = db.Column(ARRAY)
+    preferences = db.Column(ARRAY(db.String))
     email_notify = db.Column(db.Boolean)
     whatsapp_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)

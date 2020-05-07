@@ -1,7 +1,7 @@
 from flask import request,make_response, jsonify, url_for
 import uuid, jwt, datetime
 from functools import wraps
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 from api import app, db, bcrypt
 from api.routes import api
@@ -85,7 +85,18 @@ def confirm(token):
             responseObject = {
             'status': 'success',
             'message': 'Email successfully confirmed'
-        }
+            }
+
+            return make_response(jsonify(responseObject), 201)
+
+        else:
+            responseObject = {
+            'status': 'fail',
+            'message': 'Email doesnot exist'
+            }
+
+            return make_response(jsonify(responseObject), 202)
+
     except SignatureExpired:
         responseObject = {
             'status': 'fail',
@@ -93,6 +104,13 @@ def confirm(token):
         }
 
         return make_response(jsonify(responseObject), 202)
+    except BadSignature:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Invalid Token'
+        }
+
+        return make_response(jsonify(responseObject), 402)
 
 @api.route('/login', methods=['POST'])
 def login():
