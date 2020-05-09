@@ -1,0 +1,1 @@
+# app/api/email/__init__.py
