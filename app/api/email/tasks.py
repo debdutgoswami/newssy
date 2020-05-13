@@ -4,7 +4,7 @@ from flask_mail import Message
 from api import app, mail, celery
 
 @celery.task
-def deliver_contact_email(subject, name, email, link):
+def deliver_email(template, subject, name, email, link):
     """
     Send a contact e-mail.
     :param email: E-mail address of the visitor
@@ -21,9 +21,9 @@ def deliver_contact_email(subject, name, email, link):
 
     try:
         with app.app_context():
-            msg.html = render_template('confirmation.html', link=link, name=name)
+            msg.html = render_template(template, link=link, name=name)
             mail.send(msg)
     except TimeoutError:
         with app.app_context():
-            msg.html = render_template('confirmation.html', link=link, name=name)
+            msg.html = render_template(template, link=link, name=name)
             mail.send(msg)
