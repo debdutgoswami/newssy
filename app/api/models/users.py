@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 # Database ORMs
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String, unique=True)

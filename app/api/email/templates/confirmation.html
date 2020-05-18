@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Email id</title>
+        <!--<link rel="stylesheet" href="Email.css">-->
+        <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous"
+       />
+
+        <style>
+
+        body{
+            background-color: white;
+            margin: 0;
+            }
+
+        .button{
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px, 30px;
+            font-weight: lighter;
+            text-transform: uppercase;
+            transition: background-color 0.2s, border 0.2s, color 0.2s;
+            }
+
+        .btn-verify{
+            background-color: transparent;
+            border-radius: 28px;
+            padding: 10px 20px 10px 20px;
+            text-align: center;
+            color: #c0c0c0;
+            margin-right: 15px;
+            border: 1px solid #c0c0c0;
+            }
+
+        .btn-verify:hover{
+            background-color:#33AEFF;
+            color: white;
+            text-decoration: none;
+            }
+
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        </head>
+
+        <body style="text-align: center; text-emphasis-position: above">
+        <h1 style="color:#33AEFF; font-size: 4vw">Newsfeed</h1>
+
+        <h2 style="font-size: 4vw">Email Verification</h2>
+        <table border=1 px cellpadding="80" bordercolor="#33AEFF" align="center" cellspacing=0>
+        <tr>
+            <td>
+                <p width:600 px; padding: 0vw; font-size: 2vw>Hello {{name}},<br> Thank you for proceeding.<br>
+                You're almost ready to start with us.<br>Click the button to confirm your email address.</p>
+
+            <!-- <button type="button" class="btn btn-primary" onclick="window.location.href='https://www.google.com/';">Verify </button> -->
+                <a href="{{link}}" class="button btn-verify">Verify</a>
+            </td>
+         </tr> 
+         </table>
+
+        <p style="font-size: 1 px; color: gray"> If you did not sign up or request for email confirmation, please ignore this.<br> For further information, contact our team. </p>
+    </body>
+
+</html>

@@ -6,6 +6,8 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from api import app, db, bcrypt
 from api.routes import api
 from api.models.users import User
+from api.email.tasks import deliver_contact_email
+
 
 urlsafe = URLSafeTimedSerializer(app.config.get('SECRET_KEY'))
 
@@ -41,6 +43,15 @@ def signup():
 
     if not user:
         try:
+            # email Queue
+            token = urlsafe.dumps(email, salt='email-confirm')
+            deliver_contact_email.delay(
+                subject='IMPORTANT: EMAIL CONFIRMATION',
+                name=name,
+                email=email,
+                link=f"http://localhost:5000/api/confirm/{token}"
+            )
+
             user = User(
                 name=name,
                 email=email,
@@ -50,7 +61,6 @@ def signup():
             db.session.add(user)
             db.session.commit()
 
-            # email Queue
             """TODO
                 Setup email Queue using Celery and Redis
             """
@@ -79,9 +89,12 @@ def signup():
 @api.route('/confirm/<token>', methods=['GET'])
 def confirm(token):
     try:
-        email = urlsafe.loads(token, salt='', max_age=3600)
+        email = urlsafe.loads(token, salt='email-confirm', max_age=3600)
         user = User.query.filter_by(email=email).first()
+
         if user:
+            user.confirmed=True
+
             responseObject = {
             'status': 'success',
             'message': 'Email successfully confirmed'
@@ -125,6 +138,12 @@ def login():
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
 
     if bcrypt.check_password_hash(user.password, auth.get('password')):
+        if not user.confirmed:
+            return make_response(jsonify({
+                'status': 'fail',
+                'message': 'Confirm your email first to gain access.'
+            }))
+
         token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return make_response(jsonify({'token' : token.decode('UTF-8')}), 201)
