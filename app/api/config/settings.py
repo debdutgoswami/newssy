@@ -12,6 +12,7 @@ class Config(object):
     # SERVER_NAME = os.getenv('SERVER_NAME',
     #                     'localhost:{0}'.format(os.getenv('DOCKER_WEB_PORT',
     #                                                      '8080')))
+    PUBLIC_DOMAIN = os.getenv('PUBLIC_DOMAIN')
     SECRET_KEY = os.getenv('SECRET_KEY', 'yoursecret')
     # Flask-Mail.
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
