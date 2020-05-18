@@ -6,7 +6,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from api import app, db, bcrypt
 from api.routes import api
 from api.models.users import User
-from api.email.tasks import deliver_contact_email
+from api.email.tasks import deliver_email
 
 
 urlsafe = URLSafeTimedSerializer(app.config.get('SECRET_KEY'))
@@ -33,6 +33,7 @@ def token_required(f):
 
     return decorated
 
+# signup route
 @api.route('/signup', methods=['POST'])
 def signup():
     data = request.form
@@ -43,15 +44,17 @@ def signup():
 
     if not user:
         try:
-            # email Queue
+            # token
             token = urlsafe.dumps(email, salt='email-confirm')
-            deliver_contact_email.delay(
+            # email queue
+            deliver_email.delay(
+                template='confirmation.html',
                 subject='IMPORTANT: EMAIL CONFIRMATION',
                 name=name,
                 email=email,
-                link=f"http://localhost:5000/api/confirm/{token}"
+                link=f"{app.config['PUBLIC_DOMAIN']}/api/confirm/{token}"
             )
-
+            # database ORM object
             user = User(
                 name=name,
                 email=email,
@@ -60,10 +63,6 @@ def signup():
             # insert user
             db.session.add(user)
             db.session.commit()
-
-            """TODO
-                Setup email Queue using Celery and Redis
-            """
 
             responseObject = {
                 'status': 'success',
@@ -86,6 +85,7 @@ def signup():
 
         return make_response(jsonify(responseObject), 202)
 
+# verification of token for email confirmation
 @api.route('/confirm/<token>', methods=['GET'])
 def confirm(token):
     try:
@@ -94,6 +94,8 @@ def confirm(token):
 
         if user:
             user.confirmed=True
+            # commiting changes to db
+            db.session.commit()
 
             responseObject = {
             'status': 'success',
@@ -116,7 +118,94 @@ def confirm(token):
             'message': 'The token has expired'
         }
 
-        return make_response(jsonify(responseObject), 202)
+        return make_response(jsonify(responseObject), 402)
+    except BadSignature:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Invalid Token'
+        }
+
+        return make_response(jsonify(responseObject), 402)
+
+# forgot password
+@api.route('/forgotpassword', methods=['POST'])
+def forgotpassword():
+    email = request.form.get('email')
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Email doesnot exist!'
+        }
+        return make_response(jsonify(responseObject), 402)
+
+    try:
+        name = user.name
+        # token
+        token = urlsafe.dumps(email, salt='password-reset')
+        # email queue
+        deliver_email.delay(
+            template='reset.html',
+            subject='IMPORTANT: Password Reset',
+            name=name,
+            email=email,
+            link=f"http://localhost:5000/api/reset/{token}"
+        )
+
+        responseObject = {
+            'status': 'success',
+            'message': 'Email successfully sent'
+        }
+
+        return make_response(jsonify(responseObject), 201)
+    except Exception:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Some error occured!! Try again!!'
+        }
+        return make_response(jsonify(responseObject), 402)
+
+# verification of token for forgot password option
+@api.route('/reset/<token>', methods=['PUT'])
+def forgotpassword_reset(token):
+    try:
+        email = urlsafe.loads(token, salt='password-reset', max_age=3600)
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+
+            password = request.form.get('password')
+            # salting and hashing password
+            user.password = bcrypt.generate_password_hash(
+                password, app.config.get('BCRYPT_LOG_ROUNDS')
+            ).decode()
+            # commiting changes to db
+            db.session.commit()
+
+            responseObject = {
+                'status': 'success',
+                'message': 'Password successfully changed'
+            }
+
+            return make_response(jsonify(responseObject), 201)
+
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': 'Email doesnot exist'
+            }
+
+            return make_response(jsonify(responseObject), 202)
+
+    except SignatureExpired:
+        responseObject = {
+            'status': 'fail',
+            'message': 'The token has expired'
+        }
+
+        return make_response(jsonify(responseObject), 402)
     except BadSignature:
         responseObject = {
             'status': 'fail',
