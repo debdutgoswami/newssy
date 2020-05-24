@@ -36,6 +36,18 @@ def token_required(f):
 # signup route
 @api.route('/signup', methods=['POST'])
 def signup():
+    """User Signup
+
+    POST DATA:
+    name : Name of the User
+    email : Email of the User
+    password : Password of the user
+
+    Returns:
+        201 -- success
+        202 -- fail (user already exists)
+        401 -- fail (unknown error)
+    """
     data = request.form
 
     name, email, password = data.get('name'), data.get('email'), data.get('password')
@@ -88,6 +100,15 @@ def signup():
 # verification of token for email confirmation
 @api.route('/confirm/<token>', methods=['GET'])
 def confirm(token):
+    """Email Confirmation (dynamic url)
+
+    GET
+
+    Returns:
+        201 -- success
+        202 -- fail (email does not exists)
+        402 -- fail (token expired / bad signature) note: read from responseObject message
+    """
     try:
         email = urlsafe.loads(token, salt='email-confirm', max_age=3600)
         user = User.query.filter_by(email=email).first()
@@ -115,7 +136,7 @@ def confirm(token):
     except SignatureExpired:
         responseObject = {
             'status': 'fail',
-            'message': 'The token has expired'
+            'message': 'The token has expired!! Please generate a new token'
         }
 
         return make_response(jsonify(responseObject), 402)
@@ -170,6 +191,17 @@ def forgotpassword():
 # verification of token for forgot password option
 @api.route('/reset/<token>', methods=['PUT'])
 def forgotpassword_reset(token):
+    """Password Reset (dynamic url)
+
+    PUT Data:
+    email : user email
+    password : new password of the user
+
+    Returns:
+        201 -- success
+        202 -- fail (email does not exists)
+        402 -- fail (token expired / bad signature) note: read from responseObject message
+    """
     try:
         email = urlsafe.loads(token, salt='password-reset', max_age=3600)
         user = User.query.filter_by(email=email).first()
@@ -202,7 +234,7 @@ def forgotpassword_reset(token):
     except SignatureExpired:
         responseObject = {
             'status': 'fail',
-            'message': 'The token has expired'
+            'message': 'The token has expired!! Please try again my reseting your password'
         }
 
         return make_response(jsonify(responseObject), 402)
@@ -216,6 +248,16 @@ def forgotpassword_reset(token):
 
 @api.route('/login', methods=['POST'])
 def login():
+    """Password Reset (dynamic url)
+
+    POST Data:
+    email : user email
+    password : new password of the user
+
+    Returns:
+        201 -- success
+        401 -- fail (either email or password is incorrect)
+    """
     auth = request.form
 
     if not auth or not auth.get('email') or not auth.get('password'):
