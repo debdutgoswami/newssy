@@ -1,4 +1,4 @@
-from api import db
+from api.models import db
 from sqlalchemy.dialects.postgresql import BYTEA, REAL
 
 class News(db.Model):

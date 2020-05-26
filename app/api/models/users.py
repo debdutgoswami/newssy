@@ -1,5 +1,6 @@
 import datetime, uuid
-from api import db, bcrypt, app
+from api import bcrypt, app
+from api.models import db
 from sqlalchemy.dialects.postgresql import ARRAY
 
 # Database ORMs
@@ -14,6 +15,7 @@ class User(db.Model):
     joined_on =db.Column(db.String)
     admin = db.Column(db.Boolean)
     preferences = db.Column(ARRAY(db.String))
+    saved_article = db.Column(ARRAY(db.String))
     email_notify = db.Column(db.Boolean)
     whatsapp_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)
