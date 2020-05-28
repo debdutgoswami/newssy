@@ -9,4 +9,5 @@ psycopg2-binary
 
 PyJWT==1.7.1
 celery==4.4.2
+redis
 gunicorn==20.0.4
