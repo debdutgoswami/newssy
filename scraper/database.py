@@ -4,9 +4,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import BYTEA, REAL
 from sqlalchemy.orm import sessionmaker
 
+from secrets_db import URI
+
 PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
 
-engine = create_engine("postgresql://postgres:12345@localhost:5432/newsfeed",echo=True)
+engine = create_engine(URI,echo=True)
 Session = sessionmaker(bind=engine)
 # metadata = MetaData()
 Base = declarative_base()

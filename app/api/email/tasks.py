@@ -1,7 +1,9 @@
 import os
 from flask import render_template
 from flask_mail import Message
-from api import app, mail, celery
+
+from api import app, celery
+from api.email import mail
 
 @celery.task
 def deliver_email(template, subject, name, email, link):
