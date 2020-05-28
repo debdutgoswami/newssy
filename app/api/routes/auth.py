@@ -3,8 +3,9 @@ import uuid, jwt, datetime
 from functools import wraps
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
-from api import app, db, bcrypt
+from api import app, bcrypt
 from api.routes import api
+from api.models import db
 from api.models.users import User
 from api.email.tasks import deliver_email
 
@@ -263,7 +264,7 @@ def login():
     if not auth or not auth.get('email') or not auth.get('password'):
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
 
-    user = User.query.filter_by(name=auth.username).first()
+    user = User.query.filter_by(email=auth.get('email')).first()
 
     if not user:
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
