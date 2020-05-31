@@ -256,3 +256,30 @@ def saved_article(current_user):
         }
 
     return make_response(jsonify(responseObject), 201)
+
+
+# works for both admin as well as users
+@api.route('/admin/scrapers')
+@api.route('/list-scrapers')
+@token_required
+def admin_scrapers(current_user):
+    """Scraper List
+
+    Request Type:
+        GET
+
+    HEADERS:
+        x-access-token -- JWT
+
+    Returns:
+        responseObject -- success (list of scrappers)
+
+    Response Code:
+        201 -- success
+    """
+    scrapers = db.session.query(News.source).distinct()
+
+    return make_response({
+        'status' : 'success',
+        'message': scrapers
+    }, 201)
