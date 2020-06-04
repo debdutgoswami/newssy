@@ -189,7 +189,7 @@ def change_email(current_user):
             subject='IMPORTANT: EMAIL CONFIRMATION',
             name=current_user.name,
             email=email,
-            link=f"{app.config['PUBLIC_DOMAIN']}/api/confirm/{token}"
+            link=f"{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
         )
         # insert user
         current_user.email = email

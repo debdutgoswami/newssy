@@ -152,6 +152,17 @@ def confirm(token):
 # forgot password
 @api.route('/forgotpassword', methods=['POST'])
 def forgotpassword():
+    """Forgot Password
+
+    POST Data:
+    email : user email
+
+    Returns:
+        201 -- success (confirmation mail sent)
+        401 -- fail (either email or password is incorrect)
+        402 -- fail (unknown error. Try again!)
+        403 -- fail (user does not exist)
+    """
     email = request.form.get('email')
 
     user = User.query.filter_by(email=email).first()
@@ -161,7 +172,7 @@ def forgotpassword():
             'status': 'fail',
             'message': 'Email doesnot exist!'
         }
-        return make_response(jsonify(responseObject), 402)
+        return make_response(jsonify(responseObject), 403)
 
     try:
         name = user.name
@@ -249,7 +260,7 @@ def forgotpassword_reset(token):
 
 @api.route('/login', methods=['POST'])
 def login():
-    """Password Reset (dynamic url)
+    """Login
 
     POST Data:
     email : user email
@@ -258,6 +269,8 @@ def login():
     Returns:
         201 -- success
         401 -- fail (either email or password is incorrect)
+        402 -- fail (user not confirmed)
+        403 -- forbidden (user banned)
     """
     auth = request.form
 
@@ -273,8 +286,13 @@ def login():
         if not user.confirmed:
             return make_response(jsonify({
                 'status': 'fail',
-                'message': 'Confirm your email first to gain access.'
-            }))
+                'message': 'Confirm your email!!'
+            }), 402)
+        if user.BANNED:
+            return make_response({
+                'status' : 'fail',
+                'message': 'USER BANNED!!'
+            }, 403)
 
         token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 

@@ -20,8 +20,10 @@ class User(db.Model):
     email_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)
     VERIFIED = db.Column(db.Boolean) # verified tick like Twitter
+    BANNED = db.Column(db.Boolean)
+    banned_on = db.Column(db.String)
 
-    def __init__(self, name, email, password, preferences=None, saved_article=None, email_notify=False, confirmed=False):
+    def __init__(self, name, email, password, email_notify=False):
         self.public_id = uuid.uuid4()
         self.name = name
         self.email = email
@@ -32,10 +34,12 @@ class User(db.Model):
         self.joined_on = datetime.datetime.utcnow()
         self.email_notify = email_notify
         self.name_changed_on = self.joined_on
-        self.confirmed = confirmed
-        self.preferences = preferences
-        self.saved_article = saved_article
+        self.confirmed = False
+        self.preferences = None
+        self.saved_article = None
         self.VERIFIED = False
+        self.BANNED = False
+        self.banned_on = None
 
     def __repr__(self):
         return f"<User(name={self.name}, admin={self.admin})>"
