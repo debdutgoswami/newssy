@@ -41,7 +41,7 @@ def scraper_timesofindia():
                     if country!='world' or country!='india':
                         country = 'india'
 
-                    addToNews(country, title, body, 'Times of India', datetime.datetime.utcnow())
+                    addToNews(country, title, final, body, 'Times of India', datetime.datetime.utcnow())
                 except AttributeError:
                     continue
 
@@ -67,12 +67,12 @@ def scraper_bbc():
                 lit = final.split('/')
                 if lit[len(lit)-1].startswith('in-pictures'):
                     continue
-                print(final)
+                # print(final)
                 sp = BeautifulSoup(newstry.text, 'html.parser')
 
                 try:
                     title = sp.find('h1', {'class': "story-body__h1"}).text.encode('utf-8')
-                    body_tag_div = sp.find('div', {'property':"articleBody"})
+                    # body_tag_div = sp.find('div', {'property':"articleBody"})
                     body_tag_p = sp.find_all('p')
                     body = "".encode('utf-8')
                     for tag_p in body_tag_p:
@@ -86,10 +86,11 @@ def scraper_bbc():
                             continue
                         body+=p
 
-                    addToNews('world', title, body, 'BBC News', datetime.datetime.utcnow())
+                    addToNews('world', title, final, body, 'BBC News', datetime.datetime.utcnow())
                 except AttributeError:
                     continue
 
 if __name__ == "__main__":
     scraper_timesofindia()
+    scraper_bbc()
 

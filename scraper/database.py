@@ -20,6 +20,7 @@ class News(Base):
     public_id = Column(String, unique=True, nullable=False)
     country = Column(String, nullable=False)
     title = Column(BYTEA, unique=True, nullable=False)
+    url = Column(String, nullable=False, unique=True)
     body = Column(BYTEA, nullable=False)
     source = Column(String, nullable=False)
     lastupdated = Column(String, nullable=False)
@@ -32,10 +33,10 @@ class News(Base):
 #news = Table('news', metadata, autoload=True, autoload_with=engine)
 
 
-def addToNews(country: str, title: str, body: str, source: str, lastupdated: str):
+def addToNews(country: str, title: str, url:str, body: str, source: str, lastupdated: str):
     session = Session()
     try:
-        news = News(public_id=str(uuid.uuid4()), country=country, title=title, body=body, source=source, lastupdated=lastupdated)
+        news = News(public_id=str(uuid.uuid4()), country=country, title=title, url=url, body=body, source=source, lastupdated=lastupdated)
         session.add(news)
         session.commit()
     except sqlalchemy.exc.IntegrityError:

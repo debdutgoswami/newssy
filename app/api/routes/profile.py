@@ -7,7 +7,7 @@ from api.routes.auth import token_required, urlsafe
 
 from api.models import db
 from api.models.users import User
-from api.models.news import News
+from api.models.news import News, _NEWS_SOURCE
 
 from api.email.tasks import deliver_email
 
@@ -84,7 +84,7 @@ def change_preference(current_user):
         401 -- failure
     """
 
-    preferences = request.form.getlist('preference')
+    preferences = request.get_json(silent=True).get('preference')
     try:
         current_user.preferences = preferences
         db.session.commit()
@@ -123,7 +123,7 @@ def email_notification(current_user):
     Response Code:
         201 -- success
     """
-    email_notify = request.form.get('email_notify')
+    email_notify = request.get_json(silent=True).get('email_notify')
     current_user.email_notify = email_notify
     db.session.commit()
 
@@ -161,7 +161,7 @@ def change_email(current_user):
     ACTION:
         Destroy the JWT / logout the current user
     """
-    email = request.form.get('email')
+    email = request.get_json(silent=True).get('email')
     if email == current_user.email:
         responseObject = {
             'status' : 'failure',
@@ -277,9 +277,8 @@ def admin_scrapers(current_user):
     Response Code:
         201 -- success
     """
-    scrapers = db.session.query(News.source).distinct()
 
     return make_response({
         'status' : 'success',
-        'message': scrapers
+        'message': _NEWS_SOURCE
     }, 201)

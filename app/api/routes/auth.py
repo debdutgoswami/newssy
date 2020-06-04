@@ -49,7 +49,7 @@ def signup():
         202 -- fail (user already exists)
         401 -- fail (unknown error)
     """
-    data = request.form
+    data = request.get_json(silent=True)
 
     name, email, password = data.get('name'), data.get('email'), data.get('password')
 
@@ -120,8 +120,8 @@ def confirm(token):
             db.session.commit()
 
             responseObject = {
-            'status': 'success',
-            'message': 'Email successfully confirmed'
+                'status': 'success',
+                'message': 'Email successfully confirmed'
             }
 
             return make_response(jsonify(responseObject), 201)
@@ -163,7 +163,7 @@ def forgotpassword():
         402 -- fail (unknown error. Try again!)
         403 -- fail (user does not exist)
     """
-    email = request.form.get('email')
+    email = request.get_json(silent=True).get('email')
 
     user = User.query.filter_by(email=email).first()
 
@@ -220,7 +220,7 @@ def forgotpassword_reset(token):
 
         if user:
 
-            password = request.form.get('password')
+            password = request.get_json(silent=True).get('password')
             # salting and hashing password
             user.password = bcrypt.generate_password_hash(
                 password, app.config.get('BCRYPT_LOG_ROUNDS')
@@ -272,7 +272,7 @@ def login():
         402 -- fail (user not confirmed)
         403 -- forbidden (user banned)
     """
-    auth = request.form
+    auth = request.get_json(silent=True)
 
     if not auth or not auth.get('email') or not auth.get('password'):
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
