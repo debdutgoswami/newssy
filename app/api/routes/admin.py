@@ -67,8 +67,8 @@ def admin_ban(current_user):
         201 -- success
         401 -- fail
     """
-    public_id = request.form.get('public_id')
-    action = request.form.get('action')
+    public_id = request.get_json(silent=True).get('public_id')
+    action = request.get_json(silent=True).get('action')
 
     try:
         action = bool(action)

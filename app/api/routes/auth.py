@@ -49,7 +49,7 @@ def signup():
         202 -- fail (user already exists)
         401 -- fail (unknown error)
     """
-    data = request.form
+    data = request.get_json(silent=True)
 
     name, email, password = data.get('name'), data.get('email'), data.get('password')
 
@@ -120,8 +120,8 @@ def confirm(token):
             db.session.commit()
 
             responseObject = {
-            'status': 'success',
-            'message': 'Email successfully confirmed'
+                'status': 'success',
+                'message': 'Email successfully confirmed'
             }
 
             return make_response(jsonify(responseObject), 201)
@@ -152,7 +152,18 @@ def confirm(token):
 # forgot password
 @api.route('/forgotpassword', methods=['POST'])
 def forgotpassword():
-    email = request.form.get('email')
+    """Forgot Password
+
+    POST Data:
+    email : user email
+
+    Returns:
+        201 -- success (confirmation mail sent)
+        401 -- fail (either email or password is incorrect)
+        402 -- fail (unknown error. Try again!)
+        403 -- fail (user does not exist)
+    """
+    email = request.get_json(silent=True).get('email')
 
     user = User.query.filter_by(email=email).first()
 
@@ -161,7 +172,7 @@ def forgotpassword():
             'status': 'fail',
             'message': 'Email doesnot exist!'
         }
-        return make_response(jsonify(responseObject), 402)
+        return make_response(jsonify(responseObject), 403)
 
     try:
         name = user.name
@@ -209,7 +220,7 @@ def forgotpassword_reset(token):
 
         if user:
 
-            password = request.form.get('password')
+            password = request.get_json(silent=True).get('password')
             # salting and hashing password
             user.password = bcrypt.generate_password_hash(
                 password, app.config.get('BCRYPT_LOG_ROUNDS')
@@ -249,7 +260,7 @@ def forgotpassword_reset(token):
 
 @api.route('/login', methods=['POST'])
 def login():
-    """Password Reset (dynamic url)
+    """Login
 
     POST Data:
     email : user email
@@ -258,8 +269,10 @@ def login():
     Returns:
         201 -- success
         401 -- fail (either email or password is incorrect)
+        402 -- fail (user not confirmed)
+        403 -- forbidden (user banned)
     """
-    auth = request.form
+    auth = request.get_json(silent=True)
 
     if not auth or not auth.get('email') or not auth.get('password'):
         return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
@@ -273,8 +286,13 @@ def login():
         if not user.confirmed:
             return make_response(jsonify({
                 'status': 'fail',
-                'message': 'Confirm your email first to gain access.'
-            }))
+                'message': 'Confirm your email!!'
+            }), 402)
+        if user.BANNED:
+            return make_response({
+                'status' : 'fail',
+                'message': 'USER BANNED!!'
+            }, 403)
 
         token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
