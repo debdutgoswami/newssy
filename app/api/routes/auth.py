@@ -275,12 +275,12 @@ def login():
     auth = request.get_json(silent=True)
 
     if not auth or not auth.get('email') or not auth.get('password'):
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
+        return make_response('Could not verify', 401)
 
     user = User.query.filter_by(email=auth.get('email')).first()
 
     if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
+        return make_response('Could not verify', 401)
 
     if bcrypt.check_password_hash(user.password, auth.get('password')):
         if not user.confirmed:
@@ -296,6 +296,6 @@ def login():
 
         token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token' : token.decode('UTF-8')}), 201)
+        return make_response({'token' : token.decode('UTF-8')}, 201)
 
-    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!!"'})
+    return make_response('Could not verify', 401)
