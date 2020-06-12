@@ -294,7 +294,7 @@ def login():
                 'message': 'USER BANNED!!'
             }, 403)
 
-        token = jwt.encode({'public_id': user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id': user.public_id, 'name': user.name, 'email': user.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return make_response({'token' : token.decode('UTF-8')}, 201)
 
