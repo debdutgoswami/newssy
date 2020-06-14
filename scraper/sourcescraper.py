@@ -2,8 +2,10 @@ from bs4 import BeautifulSoup
 import requests, datetime
 try:
     from scraper.database import addToNews
+    from scraper.categories import predict
 except ModuleNotFoundError:
     from database import addToNews
+    from categories import predict
 
 def scraper_timesofindia():
     BASE = 'https://timesofindia.indiatimes.com'
@@ -36,18 +38,29 @@ def scraper_timesofindia():
 
                 try:
                     title = sp.find('h1').text.encode('utf-8')
-                    body = sp.find('div', {'class': "_3WlLe clearfix"}).text.encode('utf-8')
+                    body = sp.find('div', {'class': "_3WlLe clearfix"})\
+                        .text\
+                        .encode('utf-8')
 
                     if country!='world' or country!='india':
                         country = 'india'
-
-                    addToNews(country, title, final, body, 'Times of India', datetime.datetime.utcnow())
+                    category = predict(title)
+                    addToNews(
+                        country, title, final, body, 'Times of India',
+                        datetime.datetime.utcnow(), category
+                    )
                 except AttributeError:
                     continue
 
 def scraper_bbc():
 
-    IGNORE = ['Email','Facebook','Messenger','Twitter','Pinterest','WhatsApp','LinkedIn','Copy this link','These are external links and will open in a new window', 'Share this with']
+    IGNORE = [
+        'Email','Facebook','Messenger','Twitter','Pinterest','WhatsApp',
+        'LinkedIn','Copy this link',
+        'These are external links and will open in a new window',
+        'Share this with'
+    ]
+
     url = 'https://www.bbc.com'
 
     s = requests.Session()
@@ -67,12 +80,14 @@ def scraper_bbc():
                 lit = final.split('/')
                 if lit[len(lit)-1].startswith('in-pictures'):
                     continue
-                # print(final)
+
                 sp = BeautifulSoup(newstry.text, 'html.parser')
 
                 try:
-                    title = sp.find('h1', {'class': "story-body__h1"}).text.encode('utf-8')
-                    # body_tag_div = sp.find('div', {'property':"articleBody"})
+                    title = sp.find('h1', {'class': "story-body__h1"})\
+                        .text\
+                        .encode('utf-8')
+
                     body_tag_p = sp.find_all('p')
                     body = "".encode('utf-8')
                     for tag_p in body_tag_p:
@@ -85,12 +100,14 @@ def scraper_bbc():
                         if flag:
                             continue
                         body+=p
-
-                    addToNews('world', title, final, body, 'BBC News', datetime.datetime.utcnow())
+                    category = predict(title)
+                    addToNews(
+                        'world', title, final, body, 'BBC News',
+                        datetime.datetime.utcnow(), category
+                    )
                 except AttributeError:
                     continue
 
 if __name__ == "__main__":
     scraper_timesofindia()
     scraper_bbc()
-

@@ -11,3 +11,7 @@ PyJWT==1.7.1
 celery==4.4.2
 redis
 gunicorn==20.0.4
+
+Flask-Cors==3.0.8
+
+scikit-learn==0.23.1

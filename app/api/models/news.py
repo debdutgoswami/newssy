@@ -16,8 +16,7 @@ class News(db.Model):
     source = db.Column(db.String, nullable=False) # name of the news vendor
     lastupdated = db.Column(db.String, nullable=False) # time the news was added
     # obtained from Ml model
-    category = db.Column(db.String)
-    accuracy = db.Column(REAL)
+    category = db.Column(db.String, nullable=False)
 
     def __repr__(self):
         return f"<News(title={self.title}, source={self.source}, lastupdated={self.lastupdated})>"

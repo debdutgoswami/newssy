@@ -24,8 +24,7 @@ class News(Base):
     body = Column(BYTEA, nullable=False)
     source = Column(String, nullable=False)
     lastupdated = Column(String, nullable=False)
-    category = Column(String)
-    accuracy = Column(REAL)
+    category = Column(String, nullable=False)
 
     def __repr__(self):
         return f"<News(title={self.title}, source={self.source}, lastupdated={self.lastupdated})>"
@@ -33,10 +32,21 @@ class News(Base):
 #news = Table('news', metadata, autoload=True, autoload_with=engine)
 
 
-def addToNews(country: str, title: str, url:str, body: str, source: str, lastupdated: str):
+def addToNews(country: str, title: str, url:str, body: str, source: str, lastupdated: str, category: str):
     session = Session()
+
     try:
-        news = News(public_id=str(uuid.uuid4()), country=country, title=title, url=url, body=body, source=source, lastupdated=lastupdated)
+        news = News(
+            public_id = str(uuid.uuid4()),
+            country = country,
+            title = title,
+            url = url,
+            body = body,
+            source = source,
+            lastupdated = lastupdated,
+            category = category
+        )
+    
         session.add(news)
         session.commit()
     except sqlalchemy.exc.IntegrityError:
