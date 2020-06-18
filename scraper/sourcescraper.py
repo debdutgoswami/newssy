@@ -23,43 +23,33 @@ def scraper_timesofindia():
 
         try:
             url_new = tmp['href']
-        except KeyError:
-            url_new = None
-        except TypeError:
+        except:
             url_new = None
 
         if url_new and url_new.startswith('/') and url_new.endswith('.cms'):
-            final = BASE+url_new
+            article_url = BASE+url_new
 
-            with s.get(final, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
+            with s.get(article_url, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
                 country = url_new.split('/')[1]
 
                 sp = BeautifulSoup(newstry.text, 'html.parser')
 
                 try:
-                    title = sp.find('h1').text.encode('utf-8')
-                    body = sp.find('div', {'class': "_3WlLe clearfix"})\
-                        .text\
-                        .encode('utf-8')
+                    title = sp.find('h1').text
 
                     if country!='world' or country!='india':
                         country = 'india'
+
                     category = predict(title)
+
                     addToNews(
-                        country, title, final, body, 'Times of India',
+                        country, title, article_url, 'Times of India',
                         datetime.datetime.utcnow(), category
                     )
                 except AttributeError:
                     continue
 
 def scraper_bbc():
-
-    IGNORE = [
-        'Email','Facebook','Messenger','Twitter','Pinterest','WhatsApp',
-        'LinkedIn','Copy this link',
-        'These are external links and will open in a new window',
-        'Share this with'
-    ]
 
     url = 'https://www.bbc.com'
 
@@ -74,35 +64,22 @@ def scraper_bbc():
         url_tag = tag['href']
 
         if url_tag.startswith('/'):
-            final = url+url_tag
+            article_url = url+url_tag
 
-            with s.get(final, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
-                lit = final.split('/')
+            with s.get(article_url, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
+                lit = article_url.split('/')
                 if lit[len(lit)-1].startswith('in-pictures'):
                     continue
 
                 sp = BeautifulSoup(newstry.text, 'html.parser')
 
                 try:
-                    title = sp.find('h1', {'class': "story-body__h1"})\
-                        .text\
-                        .encode('utf-8')
+                    title = sp.find('h1', {'class': "story-body__h1"}).text
 
-                    body_tag_p = sp.find_all('p')
-                    body = "".encode('utf-8')
-                    for tag_p in body_tag_p:
-                        p = tag_p.text.encode('utf-8')
-                        flag = False
-                        for ele in IGNORE:
-                            if p.decode().startswith(ele):
-                                flag = True
-                                break
-                        if flag:
-                            continue
-                        body+=p
                     category = predict(title)
+
                     addToNews(
-                        'world', title, final, body, 'BBC News',
+                        'world', title, article_url, 'BBC News',
                         datetime.datetime.utcnow(), category
                     )
                 except AttributeError:

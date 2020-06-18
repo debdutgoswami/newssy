@@ -19,9 +19,9 @@ class News(Base):
     id = Column(Integer, primary_key=True)
     public_id = Column(String, unique=True, nullable=False)
     country = Column(String, nullable=False)
-    title = Column(BYTEA, unique=True, nullable=False)
+    title = Column(String, unique=True, nullable=False)
     url = Column(String, nullable=False, unique=True)
-    body = Column(BYTEA, nullable=False)
+    # body = Column(BYTEA, nullable=False)
     source = Column(String, nullable=False)
     lastupdated = Column(String, nullable=False)
     category = Column(String, nullable=False)
@@ -32,7 +32,7 @@ class News(Base):
 #news = Table('news', metadata, autoload=True, autoload_with=engine)
 
 
-def addToNews(country: str, title: str, url:str, body: str, source: str, lastupdated: str, category: str):
+def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, category: str):
     session = Session()
 
     try:
@@ -41,7 +41,7 @@ def addToNews(country: str, title: str, url:str, body: str, source: str, lastupd
             country = country,
             title = title,
             url = url,
-            body = body,
+            # body = body,
             source = source,
             lastupdated = lastupdated,
             category = category
