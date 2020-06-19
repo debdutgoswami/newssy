@@ -1,5 +1,12 @@
 import pickle, os
 
+CATEGORIES = {
+    'b': 'Business',
+    't': 'Science and Technology',
+    'e': 'Entertainment',
+    'm': 'Health'
+}
+
 def predict(title: str):
     path = os.path.join(os.getcwd(), 'model')
 
@@ -12,4 +19,4 @@ def predict(title: str):
     encoder = pickle.load(open(os.path.join(path, enc), 'rb'))
     result = model.predict(vectorizer.transform([title]))
 
-    return encoder.inverse_transform(result)[0]
+    return CATEGORIES[encoder.inverse_transform(result)[0]]
