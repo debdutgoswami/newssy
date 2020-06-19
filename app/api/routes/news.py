@@ -15,31 +15,31 @@ def get_filter_by(category, source, country):
     """For generating suitable function parameters for querying the database
 
     Args:
-        category (list): list of categories
-        source (list): list of sources
-        country (list): list of sources
+        category (str): category
+        source (str): source
+        country (str): country
 
     Returns:
         dict: function parameters
     """
-    if len(category) and len(source) and len(country):
+    if category and source and country:
         return {
-            "category": category[0],
-            "source": source[0],
-            "country": country[0]
+            "category": category,
+            "source": source,
+            "country": country
         }
-    elif len(category) and len(source):
-        return {"category": category[0], "source": source[0]}
-    elif len(source) and len(country):
-        return {"source": source[0], "country": country[0]}
-    elif len(country) and len(category):
-        return {"category": category[0], "country": country[0]}
-    elif len(category):
-        return {"category": category[0]}
-    elif len(source):
-        return {"source": source[0]}
-    elif len(country):
-        return {"country": country[0]}
+    elif category and source:
+        return {"category": category, "source": source}
+    elif source and country:
+        return {"source": source, "country": country}
+    elif country and category:
+        return {"category": category, "country": country}
+    elif category:
+        return {"category": category}
+    elif source:
+        return {"source": source}
+    elif country:
+        return {"country": country}
     else:
         return dict()
 
@@ -50,9 +50,9 @@ def get_by_filter():
     """Fetch News
 
     POST DATA:
-    category : filter by category (ARRAY)
-    source : filter by source (ARRAY)
-    country : filter by country/region (ARRAY)
+    category : filter by category (str)
+    source : filter by source (str)
+    country : filter by country/region (str)
     page : current page number (default : 1)
     per_page : number of items per page (default : 20)
 
@@ -82,7 +82,7 @@ def get_by_filter():
             **func_parms
         ).order_by(News.lastupdated.desc())\
         .paginate(page=page, per_page=per_page)
-
+        
         for article in articles.items:
             responseARRAY.append({
                 'public_id': article.public_id,
