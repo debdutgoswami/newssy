@@ -1,4 +1,4 @@
-from flask import request, make_response, jsonify
+from flask import request, make_response
 
 from api import app
 
@@ -15,33 +15,23 @@ def get_filter_by(category, source, country):
     """For generating suitable function parameters for querying the database
 
     Args:
-        category (str): category
-        source (str): source
-        country (str): country
+        category (list): category
+        source (list): source
+        country (list): country
 
     Returns:
-        dict: function parameters
+        list: arguments
     """
-    if category and source and country:
-        return {
-            "category": category,
-            "source": source,
-            "country": country
-        }
-    elif category and source:
-        return {"category": category, "source": source}
-    elif source and country:
-        return {"source": source, "country": country}
-    elif country and category:
-        return {"category": category, "country": country}
-    elif category:
-        return {"category": category}
-    elif source:
-        return {"source": source}
-    elif country:
-        return {"country": country}
-    else:
-        return dict()
+    parms = list()
+
+    if len(category):
+        parms.append(News.category.in_(category))
+    if len(source):
+        parms.append(News.source.in_(source))
+    if len(country):
+        parms.append(News.country.in_(country))
+    
+    return parms
 
 
 @api.route('/get-news', methods=['POST'])
@@ -50,11 +40,11 @@ def get_by_filter():
     """Fetch News
 
     POST DATA:
-    category : filter by category (str)
-    source : filter by source (str)
-    country : filter by country/region (str)
-    page : current page number (default : 1)
-    per_page : number of items per page (default : 20)
+    category : filter by category (ARRAY)
+    source : filter by source (ARRAY)
+    country : filter by country/region (ARRAY)
+    page : current page number (default : 1)(INT)
+    per_page : number of items per page (default : 20)(INT)
 
     Returns:
         201 -- success
@@ -73,13 +63,12 @@ def get_by_filter():
     responseARRAY = list()
     try:
         func_parms = get_filter_by(category, source, country)
-
         # order by latest to oldest
         # per_page will send that many articles in each request
         # page will say which page to traverse
-        # `**func_parms` are function parameters passed as dictionary
-        articles = News.query.filter_by(
-            **func_parms
+        # `*func_parms` are function parameters passed as list of arguments
+        articles = News.query.filter(
+            *func_parms
         ).order_by(News.lastupdated.desc())\
         .paginate(page=page, per_page=per_page)
         
@@ -98,7 +87,8 @@ def get_by_filter():
             'status' : 'success',
             'message': responseARRAY
         }, 201)
-    except:
+    except Exception as e:
+        print(e)
         return make_response({
             'status' : 'fail',
             'message': 'Page not found'

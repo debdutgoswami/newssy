@@ -43,7 +43,7 @@ class RegisterForm extends Form {
   };
 
   render() {
-    if (auth.isLoggedIn()==true) return <Redirect to="/" />
+    if (auth.isLoggedIn()===true) return <Redirect to="/" />
     return (
       <div>
         <h1>Register</h1>
