@@ -3,6 +3,7 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import * as userService from "../services/userService";
 import auth from "../services/authService";
+import { Redirect } from "react-router-dom";
 
 class RegisterForm extends Form {
   state = {
@@ -27,9 +28,12 @@ class RegisterForm extends Form {
   doSubmit = async () => {
     try {
       const response = await userService.register(this.state.data);
-      auth.loginWithJwt(response.headers["x-auth-token"]);
+      console.log(response);
+      // auth.loginWithJwt(response.headers["x-auth-token"]);
+      // TODO response code check
       window.location = "/";
     } catch (ex) {
+      console.log(ex.response);
       if (ex.response && ex.response.status === 400) {
         const errors = { ...this.state.errors };
         errors.email = ex.response.data;
@@ -39,6 +43,7 @@ class RegisterForm extends Form {
   };
 
   render() {
+    if (auth.isLoggedIn()===true) return <Redirect to="/" />
     return (
       <div>
         <h1>Register</h1>

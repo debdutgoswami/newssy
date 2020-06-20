@@ -9,24 +9,34 @@ http.setJwt(getJwt());
 
 export async function login(email, password) {
   const { data: jwt } = await http.post(apiEndpoint, { email, password });
-  localStorage.setItem(tokenKey, jwt);
-  console.log(jwt)
+  localStorage.setItem(tokenKey, jwt["token"]);
 }
 
 export function loginWithJwt(jwt) {
-  console.log(jwtDecode(jwt))
-  localStorage.setItem(tokenKey, jwt);
+  localStorage.setItem(tokenKey, jwt["token"]);
 }
 
 export function logout() {
-  console.log(tokenKey)
   localStorage.removeItem(tokenKey);
+}
+
+export function isLoggedIn() {
+  try {
+    const jwt = localStorage.getItem(tokenKey);
+    if (jwt){
+      return true;
+    }else {
+      return false;
+    }
+  }
+  catch (e) {
+    return false;
+  }
 }
 
 export function getCurrentUser() {
   try {
     const jwt = localStorage.getItem(tokenKey);
-    console.log(jwtDecode(jwt))
     return jwtDecode(jwt);
   } catch (ex) {
     return null;
@@ -43,5 +53,6 @@ export default {
   loginWithJwt,
   logout,
   getCurrentUser,
-  getJwt
+  getJwt,
+  isLoggedIn
 };

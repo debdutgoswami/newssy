@@ -32,7 +32,7 @@ class LoginForm extends Form {
   };
 
   render() {
-    if (auth.getCurrentUser()) return <Redirect to="/" />;
+    if (auth.isLoggedIn()===true) return <Redirect to="/" />;
 
     return (
       <div>

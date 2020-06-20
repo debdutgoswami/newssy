@@ -38,7 +38,7 @@ class App extends Component {
               render={(props) => <Movies {...props} user={this.state.user} />}
             /> */}
             <Route path="/not-found" component={NotFound} />
-            <Redirect from="/" exact to="/login" />
+            <Redirect from="/" exact to="/news" />
             <Redirect to="/not-found" />
           </Switch>
         </main>
