@@ -1,0 +1,158 @@
+Authentication
+
+1. /api/signup POST
+    
+        BODY:
+            name : Name of the User
+            email : Name of the User
+            password : Password of the user
+
+         RETURN CODE:
+            201 -- success
+            202 -- fail (user already exists)
+            401 -- fail (unknown error)
+
+2.  /api/confirm GET
+        BODY:
+            NA
+        RETURN CODE:
+            201 -- success
+            202 -- fail (email does not exists)
+            402 -- fail (token expired / bad signature) note: read from responseObject message
+
+3.  /api/forgotpassword POST
+        BODY:
+            email: user email
+        RETURN CODE:
+            201 -- success (confirmation mail sent)
+            401 -- fail (either email or password is incorrect)
+            402 -- fail (unknown error. Try again!)
+            403 -- fail (user does not exist)
+
+4. /api/reset PUT
+    BODY:
+        email : user email
+        password : new password of the user
+    RETURN CODE:
+        201 -- success
+        202 -- fail (email does not exists)
+        402 -- fail (token expired / bad signature) note: read from responseObject message
+
+5.  /api/login POST
+        BODY:
+            email : user email
+            password : new password of the user
+        RETURN CODE:
+            201 -- success
+            401 -- fail (either email or password is incorrect)
+            402 -- fail (user not confirmed)
+            403 -- forbidden (user banned)
+
+Admin   
+
+1.  /api/admin/users GET
+        BODY:
+            NA
+        HEADERS:
+            x-access-token -- JWT
+        RETURN CODE:
+            responseObject -- success (list of users along with their details)
+        RESPONE CODE:
+            201 -- success
+
+2.  /api/admin/ban POST
+        HEADERS:
+            x-access-token -- JWT
+        BODY:
+            public_id -- public id of the user to be banned
+            action (boolean) -- True: BAN   False: UN-BAN
+        RESPONE CODE:
+            201 -- success
+            401 -- fail
+
+NEWS
+
+1.  /api/get-news POST
+        BODY:
+            category : filter by category (ARRAY)
+            source : filter by source (ARRAY)
+            country : filter by country/region (ARRAY)
+            page : current page number (default : 1)(INT)
+            per_page : number of items per page (default : 20)(INT)
+        RETURN CODE:
+            201 -- success
+            401 -- page not found
+
+PROFILE
+
+1.  /api/profile-data GET
+        HEADERS:
+            x-access-token -- JWT
+        RETURN CODE:
+            responseObject -- profile data
+        RESPONE CODE:
+            201 -- success
+
+2.  /api/change-name PUT
+        HEADERS:
+            x-access-token -- JWT
+        BODY:
+            name -- new name
+        RETURN CODE:
+            responseObject -- success or failure
+        RESPONSE CODE:
+            201 -- success
+            403 -- forbidden
+
+3.  /api/change-preference PUT
+        HEADERS:
+            x-access-token -- JWT
+        BODY:
+            preference -- list of prefered news vendors
+        RETURN CODE:
+             responseObject -- success or failure
+        RESPONE CODE:
+            201 -- success
+            401 -- failure
+
+4.  /api/email-notification PUT
+        HEADERS:
+        x-access-token -- JWT
+        BODY:
+            email_notify -- Boolean
+        RETURN CODE:
+            responseObject -- success
+        RESPONE CODE:
+            201 -- success
+
+5. /api/change-email PUT
+        HEADERS:
+            x-access-token -- JWT
+        BODY:
+            email -- new email
+        RETURN CODE:
+            responseObject -- success or failure
+        RESPONE CODE:
+            201 -- success
+            401 -- failure (same email)
+            402 -- failure (email already exists)
+            405 -- Unknown ERROR
+        ACTION:
+            Destroy the JWT / logout the current user
+
+6. /api/show-article GET
+        HEADERS:
+            x-access-token -- JWT
+        RETURN CODE:
+            responseObject -- profile data
+        RESPONE CODE:
+            201 -- success
+
+7. /api/admin/scrapers GET
+   /api/list-scrapers GET
+        HEADERS:
+            x-access-token -- JWT
+        RETURN CODE:
+            responseObject -- success (list of scrappers)
+        RESPONE CODE:
+            201 -- success
