@@ -11,6 +11,7 @@ import NavBar from "./components/navBar";
 import auth from "./services/authService";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import news from "./components/news";
 
 class App extends Component {
   state = {};
@@ -37,6 +38,7 @@ class App extends Component {
               path="/news"
               render={(props) => <Movies {...props} user={this.state.user} />}
             /> */}
+            <Route path="/news" component={news} />
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/news" />
             <Redirect to="/not-found" />

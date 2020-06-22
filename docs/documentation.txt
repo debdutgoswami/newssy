@@ -12,7 +12,7 @@ Authentication
             202 -- fail (user already exists)
             401 -- fail (unknown error)
 
-2.  /api/confirm GET
+2.  /api/confirm/<token> GET
         BODY:
             NA
         RETURN CODE:
@@ -29,7 +29,7 @@ Authentication
             402 -- fail (unknown error. Try again!)
             403 -- fail (user does not exist)
 
-4. /api/reset PUT
+4. /api/reset/<token> PUT
     BODY:
         email : user email
         password : new password of the user
