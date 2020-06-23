@@ -12,6 +12,7 @@ import auth from "./services/authService";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import news from "./components/news";
+import Token from "./components/Token";
 
 class App extends Component {
   state = {};
@@ -40,6 +41,7 @@ class App extends Component {
             /> */}
             <Route path="/news" component={news} />
             <Route path="/not-found" component={NotFound} />
+            <Route path="/confirm" component={Token} />
             <Redirect from="/" exact to="/news" />
             <Redirect to="/not-found" />
           </Switch>
