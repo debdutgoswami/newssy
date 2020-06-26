@@ -11,7 +11,7 @@ from celery import Celery
 
 import os
 
-app = Flask(__name__, static_folder='./build', static_url_path='/',template_folder=os.path.join(os.getcwd(),'api','email','templates'))
+app = Flask(__name__, static_folder='../build', static_url_path='/',template_folder=os.path.join(os.getcwd(),'api','email','templates'))
 
 CORS(app)
 

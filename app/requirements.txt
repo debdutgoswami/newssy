@@ -6,6 +6,8 @@ Flask-Mail==0.9.1
 Flask-Bcrypt==0.7.1
 
 psycopg2-binary
+pg8000
+
 
 PyJWT==1.7.1
 celery==4.4.2
