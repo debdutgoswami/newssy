@@ -46,3 +46,26 @@
 2. Start the service by typing `service redis-server start`
 
 3. (optional) Connect to redis via redis-cli, type `redis-cli` then type `ping` in the cli
+
+Deployment (Google Cloud Platform)
+======
+
+### Setting CloudSQL
+
+We will be using a postgresql. Follow this [documentation](https://cloud.google.com/sql/docs/postgres/connect-external-app#sqlalchemy-unix).
+
+1. Create a service account key (JSON)
+
+2. Download `cloud_sql_proxy` and make it executable using `chmod +x cloud_sql_proxy`
+
+3. Create a user in the database and add an appropiate password
+
+4. Create a database named `newsfeed`
+
+5. Database URI should be of the following format <pre>postgresql+psycopg2://{username}:{password}@/?host=/cloudsql/{connection_name}</pre>
+
+6. Run the proxy first. Type the following to run it. 
+    <pre>./cloud_sql_proxy -dir=/cloudsql -instances={connection_name} \
+                -credential_file={service_account_key} &</pre>
+
+7. Now, create the tables. To create the tables, simply export the environment variables and then type the following in your terminal. <pre>python manage.py create_db</pre>

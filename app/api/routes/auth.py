@@ -159,7 +159,6 @@ def forgotpassword():
 
     Returns:
         201 -- success (confirmation mail sent)
-        401 -- fail (either email or password is incorrect)
         402 -- fail (unknown error. Try again!)
         403 -- fail (user does not exist)
     """
