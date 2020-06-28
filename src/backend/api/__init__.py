@@ -33,7 +33,7 @@ from api.routes import api
 
 app.register_blueprint(api, url_prefix='/api')
 
-@app.route('/')
-def index():
-    # serves index.html generated from REACT
-    return app.send_static_file('index.html')
+# @app.route('/')
+# def index():
+#     # serves index.html generated from REACT
+#     return app.send_static_file('index.html')
