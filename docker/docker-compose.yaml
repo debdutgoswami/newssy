@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+    backend:
+        container_name: backend
+        restart: always
+        env_file:
+            - "../env/backend.env"
+        build:
+            context: ../src/backend
+            dockerfile: Dockerfile
+        expose:
+            - 5000
+        command: gunicorn -w 1 -b 0.0.0.0:5000 wsgi:app
+        depends_on: 
+            - "redis"
+            - "cloud-sql-proxy"
+    
+    frontend:
+        container_name: frontend
+        build: 
+            context: ../src/frontend
+            dockerfile: Dockerfile
+        environment: 
+            - SERVER_NAME=0.0.0.0
+        ports: 
+            - 80:80
+            - 443:443v/backend.env
+        volumes:
+            - /home/ubuntu/ssl:/etc/nginx/certs
+        depends_on: 
+            - "backend"
+
+    redis:
+        container_name: redis
+        env_file:
+            - "../env/redis.env"
+        image: "redis:5.0.4-stretch"
+        restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+        stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
+        volumes:
+            - "redis:/data"
+
+    worker:
+        container_name: celery
+        build:
+            context: ../src/backend
+            dockerfile: Dockerfile
+        env_file:
+            - "../env/celery.env"
+        depends_on: 
+            - "redis"
+        command: celery -A api.celery worker --uid=nobody --gid=nogroup --pool=solo
+        restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+
+    cloud-sql-proxy:
+        container_name: cloud_sql_proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        # Port: MySQL (3306), PostgreSQL (5433)
+        #command: /cloud_sql_proxy -instances=cohesivenewsfeed:asia-south1:newsfeed-db -credential_file=newsfeed.json
+        command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/secrets/cloudsql/newsfeed.json
+        environment: 
+            - "../env/cloudsql.env"
+        volumes:
+        # this mounts your application default credential on the container, preventing the
+        # 'invalid json file "/config": google: read JWT from JSON credentials: 'type' field is "authorized_user" (expected "service_account")'
+        # error if you point to the actual credential file directly
+            - ../key/newsfeed.json:/secrets/cloudsql/newsfeed.json
+        ports:
+            - 5433:5433
+        restart: always
+        
+volumes: 
+    redis: {}
