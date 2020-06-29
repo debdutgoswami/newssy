@@ -21,11 +21,12 @@ services:
         build: 
             context: ../src/frontend
             dockerfile: Dockerfile
-        environment: 
+        environment:
+            - SKIP_PREFLIGHT_CHECK=true 
             - SERVER_NAME=0.0.0.0
         ports: 
             - 80:80
-            - 443:443v/backend.env
+            - 443:443
         volumes:
             - /home/ubuntu/ssl:/etc/nginx/certs
         depends_on: 
@@ -47,7 +48,7 @@ services:
             context: ../src/backend
             dockerfile: Dockerfile
         env_file:
-            - "../env/celery.env"
+            - "../env/backend.env"
         depends_on: 
             - "redis"
         command: celery -A api.celery worker --uid=nobody --gid=nogroup --pool=solo
@@ -55,12 +56,12 @@ services:
 
     cloud-sql-proxy:
         container_name: cloud_sql_proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        image: gcr.io/cloudsql-docker/gce-proxy:latest
         # Port: MySQL (3306), PostgreSQL (5433)
         #command: /cloud_sql_proxy -instances=cohesivenewsfeed:asia-south1:newsfeed-db -credential_file=newsfeed.json
         command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/secrets/cloudsql/newsfeed.json
-        environment: 
-            - "../env/cloudsql.env"
+        env_file:  
+            - ".env"
         volumes:
         # this mounts your application default credential on the container, preventing the
         # 'invalid json file "/config": google: read JWT from JSON credentials: 'type' field is "authorized_user" (expected "service_account")'
