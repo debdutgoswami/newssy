@@ -12,7 +12,8 @@ import auth from "./services/authService";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import news from "./components/news";
-import Token from "./components/Token";
+import Token from "./components/TokenVerify";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 class App extends Component {
   state = {};
@@ -28,6 +29,7 @@ class App extends Component {
     return (
       <React.Fragment>
         <ToastContainer />
+        <CssBaseline />
         <NavBar user={user} />
         <main className="container">
           <Switch>
