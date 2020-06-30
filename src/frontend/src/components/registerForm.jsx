@@ -7,7 +7,7 @@ import { Redirect } from "react-router-dom";
 
 class RegisterForm extends Form {
   state = {
-    data: { email: "", password: "", name: "" },
+    data: { email: "", password: "", cpassword: "", fname: "", lname: "" },
     errors: {}
   };
 
@@ -15,18 +15,29 @@ class RegisterForm extends Form {
     email: Joi.string()
       .required()
       .email()
-      .label("email"),
+      .label("Email"),
     password: Joi.string()
       .required()
       .min(5)
+      .max(25)
       .label("Password"),
-    name: Joi.string()
+    cpassword: Joi.string()
       .required()
-      .label("Name")
+      .valid(Joi.ref("password"))
+      .label("Confirm Password"),
+    fname: Joi.string()
+      .required()
+      .max(25)
+      .label("First Name"),
+    lname: Joi.string()
+      .required()
+      .max(25)
+      .label("Last Name")
   };
 
   doSubmit = async () => {
     try {
+      console.log(this.state.data)
       const response = await userService.register(this.state.data);
       console.log(response);
       // auth.loginWithJwt(response.headers["x-auth-token"]);
@@ -48,9 +59,9 @@ class RegisterForm extends Form {
       <div>
         <h1>Register</h1>
         <form onSubmit={this.handleSubmit}>
-          {this.renderInput("email", "email")}
-          {this.renderInput("password", "Password", "password")}
           {this.renderInput("name", "Name")}
+          {this.renderInput("email", "Email")}
+          {this.renderInput("password", "Password", "password")}
           {this.renderButton("Register")}
         </form>
       </div>
