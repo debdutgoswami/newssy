@@ -59,7 +59,8 @@ services:
         image: gcr.io/cloudsql-docker/gce-proxy:latest
         # Port: MySQL (3306), PostgreSQL (5433)
         #command: /cloud_sql_proxy -instances=cohesivenewsfeed:asia-south1:newsfeed-db -credential_file=newsfeed.json
-        command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/secrets/cloudsql/newsfeed.json
+        #command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/secrets/cloudsql/newsfeed.json
+        command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME} -credential_file=/secrets/cloudsql/newsfeed.json
         env_file:  
             - ".env"
         volumes:

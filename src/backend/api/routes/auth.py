@@ -40,7 +40,8 @@ def signup():
     """User Signup
 
     POST DATA:
-    name : Name of the User
+    fname : First Name of the User
+    lname : Last Name of the User
     email : Email of the User
     password : Password of the user
 
@@ -51,7 +52,7 @@ def signup():
     """
     data = request.get_json(silent=True)
 
-    name, email, password = data.get('name'), data.get('email'), data.get('password')
+    fname, lname, email, password = data.get('fname'), data.get('lname'), data.get('email'), data.get('password')
 
     user = User.query.filter_by(email=email).first()
 
@@ -63,13 +64,14 @@ def signup():
             deliver_email.delay(
                 template='confirmation.html',
                 subject='IMPORTANT: EMAIL CONFIRMATION',
-                name=name,
+                name=fname,
                 email=email,
-                link=f"{app.config['PUBLIC_DOMAIN']}/api/confirm/{token}"
+                link=f"{app.config['PUBLIC_DOMAIN']}/confirm/?token={token}"
             )
             # database ORM object
             user = User(
-                name=name,
+                first_name=fname,
+                last_name=lname,
                 email=email,
                 password=password
             )
@@ -174,7 +176,7 @@ def forgotpassword():
         return make_response(jsonify(responseObject), 403)
 
     try:
-        name = user.name
+        name = user.first_name
         # token
         token = urlsafe.dumps(email, salt='password-reset')
         # email queue
@@ -293,7 +295,7 @@ def login():
                 'message': 'USER BANNED!!'
             }, 403)
 
-        token = jwt.encode({'public_id': user.public_id, 'name': user.name, 'email': user.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id': user.public_id, 'name': user.first_name, 'email': user.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return make_response({'token' : token.decode('UTF-8')}, 201)
 
