@@ -33,11 +33,12 @@ def admin_users(current_user):
     final = list()
     for user in users:
         final.append({
-            'public_id': user.public_id,
-            'name'     : user.name,
-            'email'    : user.email,
-            'joined_on': user.joined_on,
-            'verified' : user.VERIFIED
+            'public_id' : user.public_id,
+            'first_name': user.first_name,
+            'last_name' : user.last_name,
+            'email'     : user.email,
+            'joined_on' : user.joined_on,
+            'verified'  : user.VERIFIED
         })
 
     return make_response({
@@ -86,7 +87,7 @@ def admin_ban(current_user):
             deliver_email.delay(
                 template='banned.html',
                 subject='IMPORTANT: BANNED',
-                name=user.name,
+                name=user.first_name,
                 email=user.email,
                 link=""
             )

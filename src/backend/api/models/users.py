@@ -9,7 +9,8 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String, unique=True)
-    name = db.Column(db.String)
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     joined_on =db.Column(db.String)
@@ -23,9 +24,10 @@ class User(db.Model):
     BANNED = db.Column(db.Boolean)
     banned_on = db.Column(db.String)
 
-    def __init__(self, name, email, password, email_notify=False):
+    def __init__(self, first_name, last_name, email, password, email_notify=False):
         self.public_id = uuid.uuid4()
-        self.name = name
+        self.first_name = first_name
+        self.last_name = last_name
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
@@ -42,4 +44,4 @@ class User(db.Model):
         self.banned_on = None
 
     def __repr__(self):
-        return f"<User(name={self.name}, admin={self.admin})>"
+        return f"<User(name={self.first_name}, admin={self.admin})>"

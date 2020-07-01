@@ -29,7 +29,8 @@ def profile_data(current_user):
         201 -- success
     """
     responseObject = {
-        'name'          : current_user.name,
+        'first_name'    : current_user.first_name,
+        'last_name'     : current_user.last_name,
         'email'         : current_user.email,
         'joined_on'     : current_user.joined_on,
         'preferences'   : current_user.preferences,
@@ -52,7 +53,8 @@ def change_name(current_user):
         x-access-token -- JWT
 
     BODY:
-        name -- new name
+        first_name -- new first name
+        last_name -- new last name
 
     Returns:
         responseObject -- success or failure
@@ -61,6 +63,7 @@ def change_name(current_user):
         201 -- success
         403 -- forbidden
     """
+    pass
 
 @api.route('/change-preference', methods=['PUT'])
 @token_required
@@ -187,7 +190,7 @@ def change_email(current_user):
         deliver_email.delay(
             template='confirmation.html',
             subject='IMPORTANT: EMAIL CONFIRMATION',
-            name=current_user.name,
+            name=current_user.first_name,
             email=email,
             link=f"{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
         )
