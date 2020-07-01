@@ -1,6 +1,6 @@
 import React from "react";
 
-const Input = ({ name, label, error, errors, ...rest }) => {
+const Input = ({ name, label, error, errors, field, ...rest }) => {
   if (name === "name") {
     return (
       <div className="row form-group">
@@ -20,7 +20,7 @@ const Input = ({ name, label, error, errors, ...rest }) => {
         </div>
       </div>
     );
-  } else if (name === "password") {
+  } else if (name === "password" && field === "cpassword") {
     return (
       <div className="row form-group">
         <div className="col">
