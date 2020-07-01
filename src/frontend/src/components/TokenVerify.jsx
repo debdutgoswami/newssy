@@ -9,12 +9,16 @@ class Token extends Component {
     const q = window.location.search;
     const url = new URLSearchParams(q);
     const token = url.get("token");
-    console.log(token);
     const apiEndpoint = apiUrl + "/confirm/" + token;
 
-    const response = await axios.get(apiEndpoint);
-    const status = response.status;
-    this.setState({ status });
+    const response = await axios.get(apiEndpoint).catch(err => {
+      this.setState({status: err.response.status})
+    });
+    
+    try {
+      const status = response.status;
+      this.setState({ status });
+    }catch (error) {}
   }
 
   render() {
