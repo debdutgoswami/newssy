@@ -34,6 +34,18 @@ def token_required(f):
 
     return decorated
 
+def send_confirmation_token(email: str, name: str):
+    # token
+    token = urlsafe.dumps(email, salt='email-confirm')
+    # email queue
+    deliver_email.delay(
+        template='confirmation.html',
+        subject='IMPORTANT: EMAIL CONFIRMATION',
+        name=name,
+        email=email,
+        link=f"{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
+    )
+
 # signup route
 @api.route('/signup', methods=['POST'])
 def signup():
@@ -58,16 +70,8 @@ def signup():
 
     if not user:
         try:
-            # token
-            token = urlsafe.dumps(email, salt='email-confirm')
-            # email queue
-            deliver_email.delay(
-                template='confirmation.html',
-                subject='IMPORTANT: EMAIL CONFIRMATION',
-                name=fname,
-                email=email,
-                link=f"{app.config['PUBLIC_DOMAIN']}/confirm/?token={token}"
-            )
+            # send confirmation email
+            send_confirmation_token(email, fname)
             # database ORM object
             user = User(
                 first_name=fname,
@@ -100,6 +104,44 @@ def signup():
 
         return make_response(jsonify(responseObject), 202)
 
+# resend confirmation email
+@api.route('/sendconfirmation', methods=['POST'])
+def resend_confirmation():
+    """Resend Confirmation
+    
+    POST
+
+    BODY:
+        email -- email to send confirmation token
+
+    Returns:
+        201 -- success
+        202 -- fail
+        502 -- some error occured
+    """
+    email = request.get_json(silent=True).get('email')
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return make_response({
+            'status' : 'fail',
+            'message': 'User does not exist'
+        }, 202)
+
+    try:
+
+        send_confirmation_token(email, user.fname)
+
+        return make_response({
+            'status' : 'success',
+            'message': 'Check your email'
+        }, 201)
+    except:
+        return make_response({
+            'status' : 'fail',
+            'message': 'Some error occured. Try again!!'
+        }, 502)
+
 # verification of token for email confirmation
 @api.route('/confirm/<token>', methods=['GET'])
 def confirm(token):
@@ -110,13 +152,14 @@ def confirm(token):
     Returns:
         201 -- success
         202 -- fail (email does not exists)
+        203 -- fail (user already confirmed)
         402 -- fail (token expired / bad signature) note: read from responseObject message
     """
     try:
         email = urlsafe.loads(token, salt='email-confirm', max_age=3600)
         user = User.query.filter_by(email=email).first()
 
-        if user:
+        if user and not user.confirmed:
             user.confirmed=True
             # commiting changes to db
             db.session.commit()
@@ -127,6 +170,13 @@ def confirm(token):
             }
 
             return make_response(jsonify(responseObject), 201)
+
+        elif user.confirmed:
+            responseObject = {
+                'status' : 'fail',
+                'message': 'User already confirmed'
+            }
+            return make_response(responseObject, 203)
 
         else:
             responseObject = {
