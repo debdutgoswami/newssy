@@ -6,7 +6,7 @@ import Select from "./select";
 class Form extends Component {
   state = {
     data: {},
-    errors: {}
+    errors: {},
   };
 
   validate = () => {
@@ -20,13 +20,13 @@ class Form extends Component {
   };
 
   validateProperty = ({ name, value }) => {
-    const obj = { [name]: value}
+    const obj = { [name]: value };
     const schema = { [name]: this.schema[name] };
     const { error } = Joi.validate(obj, schema);
     return error ? error.details[0].message : null;
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
 
     const errors = this.validate();
@@ -51,9 +51,11 @@ class Form extends Component {
 
   renderButton(label) {
     return (
-      <button disabled={this.validate()} className="btn btn-primary">
-        {label}
-      </button>
+      <div>
+        <button disabled={this.validate()} className="btn btn-primary">
+          {label}
+        </button>
+      </div>
     );
   }
 
@@ -74,13 +76,12 @@ class Form extends Component {
 
   renderInput(name, label, type = "text", field = "default") {
     const { data, errors } = this.state;
-    
+
     return (
       <Input
         field={field}
         type={type}
         name={name}
-        // value={data[name]}
         data={data}
         label={label}
         onChange={this.handleChange}

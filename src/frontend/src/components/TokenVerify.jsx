@@ -11,14 +11,14 @@ class Token extends Component {
     const token = url.get("token");
     const apiEndpoint = apiUrl + "/confirm/" + token;
 
-    const response = await axios.get(apiEndpoint).catch(err => {
-      this.setState({status: err.response.status})
+    const response = await axios.get(apiEndpoint).catch((err) => {
+      this.setState({ status: err.response.status });
     });
-    
+
     try {
       const status = response.status;
       this.setState({ status });
-    }catch (error) {}
+    } catch (error) {}
   }
 
   render() {
@@ -36,7 +36,18 @@ class Token extends Component {
           <React.Fragment>
             <h1>Token has expired</h1>
 
-            <Link to="">Generate a new one?</Link>
+            <Link to="/resend">Generate a new one?</Link>
+          </React.Fragment>
+        )}
+        {this.state.status === 404 && (
+          <React.Fragment>
+            <Link to="/">
+              <img
+                src="https://cdn.optinmonster.com/wp-content/uploads/2018/06/android-404-845x504.png"
+                width="100%"
+                alt="404ERROR"
+              />
+            </Link>
           </React.Fragment>
         )}
         {this.state.status === 202 && (

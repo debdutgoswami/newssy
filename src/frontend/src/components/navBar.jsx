@@ -175,7 +175,7 @@ const NavBar = ({ user }) => {
               <ListItemIcon>
                 <AccountCircleIcon />
               </ListItemIcon>
-              <ListItemText primary={"Profile"} />
+              <ListItemText primary={user.name} />
             </ListItem>
             <ListItem component={Link} to="/logout" button key={"Logout"}>
               <ListItemIcon>
