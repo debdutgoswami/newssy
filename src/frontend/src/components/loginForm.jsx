@@ -40,15 +40,12 @@ class LoginForm extends Form {
         const status = response.status;
         this.setState({ status });
       } catch (error) {}
-      // const { data } = this.state;
-      // // const response = await auth.login(data.email, data.password);
       const { state } = this.props.location;
       if (this.state.status) {
         if (this.state.status === 402) {
           toast.error("Confirm Your Email");
         } else if (this.state.status === 201) {
           console.log(this.state.status);
-          // window.location = "/";
           window.location = state ? state.from.pathname : "/";
         } else if (this.state.status === 401) {
           toast.error("Email or Password is incorrect");
@@ -59,15 +56,7 @@ class LoginForm extends Form {
         }
       }
       console.log(response.status);
-    } catch (ex) {
-      // if (ex.response && ex.response.status === 400) {
-      //   const errors = { ...this.state.errors };
-      //   errors.email = ex.response.data;
-      //   this.setState({ errors });
-      // } else {
-      //   this.setState({ code: ex.response.status });
-      // }
-    }
+    } catch (ex) {}
   };
 
   render() {
@@ -83,14 +72,15 @@ class LoginForm extends Form {
           {this.renderButton("Login")}
         </form>
         <div>
+          <br />
           <small>Forget password?</small>
           <a href="/resend">
-            <small>NIKALL LAWDE</small>
+            <small> reset</small>
           </a>
         </div>
-        <small>didnt registered yet?</small>
+        <small>Didn't register yet?</small>
         <a href="/signup">
-          <small>sign up NOW</small>
+          <small> sign up</small>
         </a>
       </div>
     );

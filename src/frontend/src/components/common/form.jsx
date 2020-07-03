@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Joi from "joi-browser";
 import Input from "./input";
 import Select from "./select";
-import { toast, ToastContainer } from "react-toastify";
 
 class Form extends Component {
   state = {
@@ -51,15 +50,6 @@ class Form extends Component {
   };
 
   renderButton(label) {
-    // if (code === 201) {
-    //   toast.success("Open Your Email and Verify");
-    // } else if (code === 202) {
-    //   toast.warning("User Already EXISTS");
-    // } else if (code === 402) {
-    //   toast.error("Token Expired");
-    // } else {
-    //   toast.error("UNKNOWN ERROR");
-    // }
     return (
       <div>
         <button disabled={this.validate()} className="btn btn-primary">
@@ -92,7 +82,6 @@ class Form extends Component {
         field={field}
         type={type}
         name={name}
-        // value={data[name]}
         data={data}
         label={label}
         onChange={this.handleChange}

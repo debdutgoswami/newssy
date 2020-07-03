@@ -18,20 +18,33 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-///////////////////////////////////////////////////////////////////////
+
 export default function Resend() {
-  const apiEndpoint = apiUrl + "/";
+  const apiEndpoint = apiUrl + "/sendconfirmation";
   const classes = useStyles();
   const [value, setValue] = useState("");
   const handleChange = (email) => {
     setValue(email.target.value);
   };
-  const submit = () => {
-    toast("Check Your Email");
-    console.log(value);
-    return axios.post(apiEndpoint, {
+  const submit = async () => {
+    var response;
+    response = await axios.post(apiEndpoint, {
       email: value,
+    }).catch((err) => {
+      if (err.response){
+        response = err.response.status;
+      }else {
+        return err.response;
+      }
     });
+    if (response){
+      if (response.status === 201)
+        toast.success("Check your email")
+      else if (response.status === 202)
+        toast.error("Email does not exist")
+      else
+        toast.error("Some error occured")
+    }
   };
   return (
     <div>

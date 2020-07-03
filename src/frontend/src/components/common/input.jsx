@@ -37,9 +37,6 @@ const Input = ({ name, label, error, errors, field, ...rest }) => {
             id="cpassword"
             className="form-control"
           />
-          {/* {errors["cpassword"] && (
-            <div className="alert alert-danger">{errors["cpassword"]}</div>
-          )} */}
         </div>
       </div>
     );
