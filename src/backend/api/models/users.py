@@ -8,21 +8,21 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String, unique=True)
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
-    email = db.Column(db.String, unique=True)
-    password = db.Column(db.String)
-    joined_on =db.Column(db.String)
-    name_changed_on = db.Column(db.String)
+    public_id = db.Column(db.String(100), unique=True)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    joined_on =db.Column(db.String(30))
+    name_changed_on = db.Column(db.String(30))
     admin = db.Column(db.Boolean)
-    preferences = db.Column(ARRAY(db.String))
-    saved_article = db.Column(ARRAY(db.String))
+    preferences = db.Column(ARRAY(db.String(100)))
+    saved_article = db.Column(ARRAY(db.String(100)))
     email_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)
     VERIFIED = db.Column(db.Boolean) # verified tick like Twitter
     BANNED = db.Column(db.Boolean)
-    banned_on = db.Column(db.String)
+    banned_on = db.Column(db.String(30))
 
     def __init__(self, first_name, last_name, email, password, email_notify=False):
         self.public_id = uuid.uuid4()
