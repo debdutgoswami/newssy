@@ -3,7 +3,7 @@ from flask import request, make_response
 from api import app
 
 from api.routes import api
-from api.routes.auth import token_required, urlsafe
+from api.routes.auth import token_partial_required, urlsafe
 
 from api.models import db
 from api.models.users import User
@@ -35,7 +35,7 @@ def get_filter_by(category, source, country):
 
 
 @api.route('/get-news', methods=['POST'])
-# @token_required
+@token_partial_required
 def get_by_filter():
     """Fetch News
 
@@ -85,7 +85,7 @@ def get_by_filter():
 
         return make_response({
             'status' : 'success',
-            'message': responseARRAY
+            'articles': responseARRAY
         }, 201)
     except Exception as e:
         print(e)

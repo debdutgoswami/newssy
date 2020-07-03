@@ -34,6 +34,38 @@ def token_required(f):
 
     return decorated
 
+# partially protecting news route so that 
+# only authenticated users can access
+# page more than 1 or per page articles more than 20
+def token_partial_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        data = request.get_json(silent=True)
+        page = data.get('page', 1)
+        per_page = data.get('per_page', 20)
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token and (page > 1 or per_page > 20):
+            return jsonify({'message' : 'Token is missing!!'}), 401
+
+        try:
+            if not token:
+                current_user = None
+            else:
+                data = jwt.decode(token, app.config['SECRET_KEY'])
+                current_user = User.query\
+                    .filter_by(public_id=data['public_id'])\
+                    .first()
+        except:
+            return jsonify({'message' : 'Token is invalid!!'}), 401
+
+        return  f(current_user, *args, **kwargs)
+
+    return decorated
+
 def send_confirmation_token(email: str, name: str):
     # token
     token = urlsafe.dumps(email, salt='email-confirm')
@@ -43,7 +75,7 @@ def send_confirmation_token(email: str, name: str):
         subject='IMPORTANT: EMAIL CONFIRMATION',
         name=name,
         email=email,
-        link=f"{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
+        link=f"http://{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
     )
 
 # signup route
@@ -235,7 +267,7 @@ def forgotpassword():
             subject='IMPORTANT: Password Reset',
             name=name,
             email=email,
-            link=f"http://localhost:5000/api/reset/{token}"
+            link=f"http://{app.config['PUBLIC_DOMAIN']}/api/reset/{token}"
         )
 
         responseObject = {
@@ -345,7 +377,12 @@ def login():
                 'message': 'USER BANNED!!'
             }, 403)
 
-        token = jwt.encode({'public_id': user.public_id, 'name': user.first_name, 'email': user.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode({
+            'public_id': user.public_id, 
+            'name': user.first_name, 
+            'email': user.email, 
+            'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+        }, app.config['SECRET_KEY'])
 
         return make_response({'token' : token.decode('UTF-8')}, 201)
 
