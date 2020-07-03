@@ -14,6 +14,7 @@ import "./App.css";
 import news from "./components/news";
 import Token from "./components/TokenVerify";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import Resend from "./components/resend";
 
 class App extends Component {
   state = {};
@@ -42,6 +43,7 @@ class App extends Component {
               render={(props) => <Movies {...props} user={this.state.user} />}
             /> */}
             <Route path="/news" component={news} />
+            <Route path="/resend" component={Resend} />
             <Route path="/not-found" component={NotFound} />
             <Route path="/confirm" component={Token} />
             <Redirect from="/" exact to="/news" />
