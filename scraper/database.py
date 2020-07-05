@@ -10,7 +10,7 @@ PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
 
 engine = create_engine(URI,echo=True)
 Session = sessionmaker(bind=engine)
-# metadata = MetaData()
+
 Base = declarative_base()
 
 class News(Base):
@@ -21,7 +21,8 @@ class News(Base):
     country = Column(String, nullable=False)
     title = Column(String, unique=True, nullable=False)
     url = Column(String, nullable=False, unique=True)
-    # body = Column(BYTEA, nullable=False)
+    body = Column(String, nullable=False)
+    img_url = Column(String, nullable=False)
     source = Column(String, nullable=False)
     lastupdated = Column(String, nullable=False)
     category = Column(String, nullable=False)
@@ -32,7 +33,7 @@ class News(Base):
 #news = Table('news', metadata, autoload=True, autoload_with=engine)
 
 
-def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, category: str):
+def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, body: str, img_url: str, category: str):
     session = Session()
 
     try:
@@ -41,7 +42,8 @@ def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, 
             country = country,
             title = title,
             url = url,
-            # body = body,
+            body = body,
+            img_url = img_url,
             source = source,
             lastupdated = lastupdated,
             category = category

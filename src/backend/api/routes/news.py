@@ -81,7 +81,9 @@ def get_by_filter(current_user):
                 'public_id': article.public_id,
                 'country': article.country,
                 'title': article.title,
+                'body': article.body,
                 'url': article.url,
+                'img': article.img_url,
                 'source': article.source,
                 'time': article.lastupdated,
                 'category': article.category
