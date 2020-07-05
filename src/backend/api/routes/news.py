@@ -3,7 +3,7 @@ from flask import request, make_response
 from api import app
 
 from api.routes import api
-from api.routes.auth import token_required, urlsafe
+from api.routes.auth import token_partial_required, urlsafe
 
 from api.models import db
 from api.models.users import User
@@ -35,8 +35,8 @@ def get_filter_by(category, source, country):
 
 
 @api.route('/get-news', methods=['POST'])
-# @token_required
-def get_by_filter():
+@token_partial_required
+def get_by_filter(current_user):
     """Fetch News
 
     POST DATA:
@@ -67,17 +67,23 @@ def get_by_filter():
         # per_page will send that many articles in each request
         # page will say which page to traverse
         # `*func_parms` are function parameters passed as list of arguments
-        articles = News.query.filter(
-            *func_parms
-        ).order_by(News.lastupdated.desc())\
-        .paginate(page=page, per_page=per_page)
+        if len(func_parms):
+            articles = News.query.filter(
+                *func_parms
+            ).order_by(News.lastupdated.desc())\
+            .paginate(page=page, per_page=per_page)
+        else:
+            articles = News.query.order_by(News.lastupdated.desc())\
+            .paginate(page=page, per_page=per_page)
         
         for article in articles.items:
             responseARRAY.append({
                 'public_id': article.public_id,
                 'country': article.country,
                 'title': article.title,
+                'body': article.body,
                 'url': article.url,
+                'img': article.img_url,
                 'source': article.source,
                 'time': article.lastupdated,
                 'category': article.category
@@ -85,7 +91,7 @@ def get_by_filter():
 
         return make_response({
             'status' : 'success',
-            'message': responseARRAY
+            'articles': responseARRAY
         }, 201)
     except Exception as e:
         print(e)

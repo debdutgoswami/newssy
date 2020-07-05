@@ -11,6 +11,8 @@ class News(db.Model):
     # obtained by scraping
     country = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(400), unique=True, nullable=False)
+    body = db.Column(db.String(400), nullable=False)
+    img_url = db.Column(db.String(400), nullable=False)
     url = db.Column(db.String(400), nullable=False, unique=True)
 
     source = db.Column(db.String(100), nullable=False) # name of the news vendor
