@@ -50,41 +50,45 @@ def scraper_timesofindia():
                     continue
 
 def scraper_bbc():
-
-    url = 'https://www.bbc.com'
+    WIDTH = 800
+    URL = 'https://www.bbc.com'
+    url = 'https://www.bbc.com/news'
 
     s = requests.Session()
 
     html = s.get(url,headers={'User-Agent': 'Mozilla/5.0'}).text
 
     soup = BeautifulSoup(html, 'html.parser')
-    tags = soup.find_all('a',{'class':'block-link__overlay-link'})
+    tags = set(soup.find('nav',{'role':'navigation', 'aria-label':'news'}).find_all('a'))
 
     for tag in tags:
         url_tag = tag['href']
 
         if url_tag.startswith('/'):
-            article_url = url+url_tag
+            article_url = URL+url_tag
 
             with s.get(article_url, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
                 lit = article_url.split('/')
                 if lit[len(lit)-1].startswith('in-pictures'):
                     continue
 
-                sp = BeautifulSoup(newstry.text, 'html.parser')
+                sp = BeautifulSoup(newstry.text, 'html.parser').find('div', {'class': 'gel-layout gel-layout--equal'})
 
-                try:
-                    title = sp.find('h1', {'class': "story-body__h1"}).text
+                if sp:
+                    individual = set(sp.find_all('div', {'class': 'gs-c-promo gs-t-News nw-c-promo gs-o-faux-block-link gs-u-pb gs-u-pb+@m nw-p-default gs-c-promo--inline gs-c-promo--stacked@xl gs-c-promo--flex'}))
+                    if len(individual):
+                        for article in individual:
+                            title = article.find('h3').text.strip("'")
+                            short_desc = article.find('p').text
+                            category = predict(title)
+                            img_url = article.find('img')['data-src'].format(width=WIDTH)
+                            art_url = URL + article.find('a')['href']
 
-                    category = predict(title)
-
-                    addToNews(
-                        'world', title, article_url, 'BBC News',
-                        datetime.datetime.utcnow(), category
-                    )
-                except AttributeError:
-                    continue
+                            addToNews(
+                                'world', title, art_url, 'BBC News',
+                                datetime.datetime.utcnow(), short_desc, img_url, category
+                            )
 
 if __name__ == "__main__":
-    scraper_timesofindia()
+    # scraper_timesofindia()
     scraper_bbc()
