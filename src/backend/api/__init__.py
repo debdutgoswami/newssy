@@ -1,7 +1,6 @@
 from flask import Flask, Blueprint, request
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 
 from api.models import db
 from api.email import mail
@@ -10,8 +9,8 @@ from celery import Celery
 
 import os
 
-app = Flask(__name__, static_folder='../build', static_url_path='/',template_folder=os.path.join(os.getcwd(),'api','email','templates'))
-CORS(app)
+app = Flask(__name__, template_folder=os.path.join(os.getcwd(),'api','email','templates'))
+
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
