@@ -11,11 +11,13 @@ import NavBar from "./components/navBar";
 import auth from "./services/authService";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import news from "./components/news";
+
 import Token from "./components/TokenVerify";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Resend from "./components/resend";
-import Newssy from './components/newsRender/App'
+import Newssy from "./components/newsRender/App";
+import Profile from "./components/Profile";
+
 class App extends Component {
   state = {};
 
@@ -37,6 +39,7 @@ class App extends Component {
             <Route path="/signup" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
+            <Route path="/profile" component={Profile} />;
             {/* <ProtectedRoute path="/news/:id" component={MovieForm} />
             <Route
               path="/news"
