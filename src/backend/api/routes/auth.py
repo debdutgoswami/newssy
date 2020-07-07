@@ -175,11 +175,11 @@ def resend_confirmation():
         }, 502)
 
 # verification of token for email confirmation
-@api.route('/confirm/<token>', methods=['GET'])
-def confirm(token):
+@api.route('/confirm', methods=['POST'])
+def confirm():
     """Email Confirmation (dynamic url)
 
-    GET
+    POST
 
     Returns:
         201 -- success
@@ -187,6 +187,9 @@ def confirm(token):
         203 -- fail (user already confirmed)
         402 -- fail (token expired / bad signature) note: read from responseObject message
     """
+
+    token = request.get_json(silent=True).get('token', None)
+
     try:
         email = urlsafe.loads(token, salt='email-confirm', max_age=3600)
         user = User.query.filter_by(email=email).first()

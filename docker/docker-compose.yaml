@@ -11,7 +11,6 @@ services:
             dockerfile: Dockerfile
         expose:
             - 5000
-        #command: python manage.py create_db
         command: gunicorn -w 1 -b 0.0.0.0:5000 wsgi:app
         depends_on: 
             - "redis"
@@ -19,6 +18,7 @@ services:
     
     frontend:
         container_name: frontend
+        restart: always
         build: 
             context: ../src/frontend
             dockerfile: Dockerfile
@@ -58,10 +58,9 @@ services:
     cloud-sql-proxy:
         container_name: cloud_sql_proxy
         image: gcr.io/cloudsql-docker/gce-proxy:latest
-        # Port: MySQL (3306), PostgreSQL (5433)
-        #command: /cloud_sql_proxy -instances=cohesivenewsfeed:asia-south1:newsfeed-db -credential_file=newsfeed.json
-        command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/secrets/cloudsql/newsfeed.json
-        #command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME} -credential_file=/config/newsfeed.json
+        # Port: MySQL (3306), PostgreSQL (5432)
+        command: 
+            - /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5432 -credential_file=/config/newsfeed.json
         env_file:  
             - ".env"
         volumes:
@@ -71,7 +70,7 @@ services:
             - ../key/newsfeed.json:/secrets/cloudsql/newsfeed.json
             - /cloudsql:/cloudsql
         ports:
-            - 5433:5433
+            - 5432:5432
         restart: always
         
 volumes: 

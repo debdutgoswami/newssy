@@ -36,7 +36,7 @@ def get_filter_by(category, source, country):
 
 @api.route('/get-news', methods=['POST'])
 @token_partial_required
-def get_by_filter():
+def get_by_filter(current_user):
     """Fetch News
 
     POST DATA:
@@ -67,17 +67,23 @@ def get_by_filter():
         # per_page will send that many articles in each request
         # page will say which page to traverse
         # `*func_parms` are function parameters passed as list of arguments
-        articles = News.query.filter(
-            *func_parms
-        ).order_by(News.lastupdated.desc())\
-        .paginate(page=page, per_page=per_page)
+        if len(func_parms):
+            articles = News.query.filter(
+                *func_parms
+            ).order_by(News.lastupdated.desc())\
+            .paginate(page=page, per_page=per_page)
+        else:
+            articles = News.query.order_by(News.lastupdated.desc())\
+            .paginate(page=page, per_page=per_page)
         
         for article in articles.items:
             responseARRAY.append({
                 'public_id': article.public_id,
                 'country': article.country,
                 'title': article.title,
+                'body': article.body,
                 'url': article.url,
+                'img': article.img_url,
                 'source': article.source,
                 'time': article.lastupdated,
                 'category': article.category
