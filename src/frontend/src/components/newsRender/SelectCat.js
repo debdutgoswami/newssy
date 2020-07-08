@@ -10,8 +10,7 @@ import axios from 'axios';
 //import ArticlesCard from './ArticlesCard'
 import NewsCard from './NewsCard'
 import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
-import Buttonss from './Buttonss'
+
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -69,7 +68,7 @@ export default function MultipleSelect(props) {
   const [data, setData ] = React.useState([])
 
   useEffect(() => {
-       axios.post('http://104.197.245.159:5000/api/get-news', {
+       axios.post('/api/get-news', {
         category: [...personName],
         source: [...sourceName],
         per_page: 20
@@ -168,7 +167,6 @@ export default function MultipleSelect(props) {
       ))}
       </Grid>
       <br/>
-      <Buttonss />
     </div>
   );
 }
