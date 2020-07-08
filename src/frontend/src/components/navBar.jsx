@@ -105,7 +105,7 @@ const NavBar = ({ user }) => {
       >
         <Toolbar>
           <Typography variant="h6" noWrap className={classes.title}>
-            NEWSFEED
+            Newssy
           </Typography>
           <IconButton
             color="inherit"

@@ -7,8 +7,9 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
 import axios from 'axios';
-import ArticlesCard from './ArticlesCard'
-
+//import ArticlesCard from './ArticlesCard'
+import NewsCard from './NewsCard'
+import Grid from '@material-ui/core/Grid'
 
 
 const useStyles = makeStyles(theme => ({
@@ -147,7 +148,25 @@ export default function MultipleSelect(props) {
           ))}
         </Select>
       </FormControl>
-      <ArticlesCard details={data}/>
+      <br/>
+      <Grid
+      container
+      spacing={10}
+      styles={{padding:'10px' ,margin: '15px'}}
+      >
+      {data.map(news => (
+      <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>   
+      <NewsCard 
+      description={news.body}
+      title={news.title}
+      img={news.img}
+      url={news.url}
+      id={news.public_id}
+      />
+      </Grid>  
+      ))}
+      </Grid>
+      <br/>
     </div>
   );
 }
