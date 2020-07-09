@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import LoginForm from "./components/loginForm";
 import RegisterForm from "./components/registerForm";
-
 import { ToastContainer } from "react-toastify";
 import NotFound from "./components/notFound";
 import Logout from "./components/logout";
@@ -11,12 +10,13 @@ import NavBar from "./components/navBar";
 import auth from "./services/authService";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-
+import news from "./components/news";
 import Token from "./components/TokenVerify";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Resend from "./components/resend";
-import Newssy from "./components/newsRender/App";
-import Profile from "./components/Profile";
+import Newssy from './components/newsRender/App'
+import Footer from './components/footer'
+import NavBarr from './components/navBarr'
 
 class App extends Component {
   state = {};
@@ -30,21 +30,17 @@ class App extends Component {
     const { user } = this.state;
 
     return (
-      <React.Fragment>
+        <div className="page-container">
+          <div className="content-wrap">
         <ToastContainer />
         <CssBaseline />
-        <NavBar user={user} />
+        {/* <NavBar user={user} /> */}
+        <NavBarr user={user}/>
         <main className="container">
           <Switch>
             <Route path="/signup" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
-            <Route path="/profile" component={Profile} />;
-            {/* <ProtectedRoute path="/news/:id" component={MovieForm} />
-            <Route
-              path="/news"
-              render={(props) => <Movies {...props} user={this.state.user} />}
-            /> */}
             <Route path="/news" component={Newssy} />
             <Route path="/resend" component={Resend} />
             <Route path="/not-found" component={NotFound} />
@@ -53,7 +49,10 @@ class App extends Component {
             <Redirect to="/not-found" />
           </Switch>
         </main>
-      </React.Fragment>
+        </div>
+        <br/>
+        <Footer/>
+        </div>
     );
   }
 }
