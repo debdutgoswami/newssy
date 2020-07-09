@@ -1,0 +1,24 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    width: inherit;
+    min-height: inherit;
+    margin: 0;
+    padding: 0;
+}
+.main-footer {
+    color: white;
+    /* background-color: #3f51b5; */
+    background-color: #343A40;
+    padding-top: 3em;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin: 0 auto;
+
+}
+.just {
+    justify-content: center;
+}

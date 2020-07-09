@@ -9,14 +9,23 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
+import {
+  TwitterShareButton,WhatsappShareButton,EmailShareButton,TelegramShareButton
+} from 'react-share';
+import {
+  EmailIcon,TelegramIcon,TwitterIcon,WhatsappIcon
+} from "react-share";
+import './Share.css';
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 345,
+    maxWidth: 350,
+    margin: 0,
+    padding: 0
   },
   media: {
-    height: 140,
-  },
+    height: 140
+    },
 });
 
 export default function NewsCard({description, title, img, url, id}) {
@@ -44,8 +53,34 @@ export default function NewsCard({description, title, img, url, id}) {
             <FavoriteIcon color="secondary"/>
         </IconButton>
         <IconButton aria-label="share">
-            <ShareIcon  color="primary"/>
+          <TwitterShareButton
+            url={url}
+            title={title}
+            className="Demo__some-network__share-button"
+          >
+            <TwitterIcon size={32} round />
+          </TwitterShareButton>
+          </IconButton>
+          <IconButton aria-label="share">
+          <WhatsappShareButton
+            url={url}
+            title={title}
+            separator=":: "
+            className="Demo__some-network__share-button"
+          >
+            <WhatsappIcon size={32} round />
+          </WhatsappShareButton>
         </IconButton>
+        <IconButton aria-label="share">
+        <EmailShareButton
+            url={url}
+            subject={title}
+            body="body"
+            className="Demo__some-network__share-button"
+          >
+            <EmailIcon size={32} round />
+          </EmailShareButton>
+          </IconButton>
       </CardActions>
     </Card>
   );

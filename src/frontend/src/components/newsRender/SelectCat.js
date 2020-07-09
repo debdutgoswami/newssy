@@ -68,7 +68,7 @@ export default function MultipleSelect(props) {
   const [data, setData ] = React.useState([])
 
   useEffect(() => {
-       axios.post('/api/get-news', {
+       axios.post('/api/get-http://104.197.245.159:5000/api/get-news', {
         category: [...personName],
         source: [...sourceName],
         per_page: 20
