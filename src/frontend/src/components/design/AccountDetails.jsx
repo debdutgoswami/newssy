@@ -13,6 +13,10 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import axios from "axios";
+import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/core/styles";
+
+import SaveIcon from "@material-ui/icons/Save";
 
 // const useStyles = makeStyles({
 //   root: {
@@ -22,6 +26,12 @@ import axios from "axios";
 //     color: "#e1f5fe",
 //   },
 // });
+
+const useStyles = makeStyles((theme) => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+}));
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -101,11 +111,20 @@ const news = async ({ Account }) => {
 
 const AccountDetails = ({ Account }) => {
   const apiEndpoint = apiurl.apiUrl + "/email-notification";
-  // const classes = useStyles();
+  const classes = useStyles();
   console.log({ Account });
   const [button, setButton] = useState({
     checked: Account.email_notify,
   });
+  var arr = [];
+  arr = Account.preferences;
+
+  const [save, setSave] = useState(arr);
+  console.log(save);
+  const handleSave = async (event) => {
+    console.log({});
+  };
+
   // const [button, setButton] = useState({
   //   checked: Account.email_notify,
   // });
@@ -132,7 +151,7 @@ const AccountDetails = ({ Account }) => {
       });
     try {
       const profile = response;
-      // console.log(profile);
+      console.log(profile);
     } catch (error) {}
   };
   const categories = [
@@ -184,10 +203,12 @@ const AccountDetails = ({ Account }) => {
                   checked={selected}
                 />
                 {console.log(selected)}
+                if(selected) setSave(option.title)
                 {option.title}
+                {console.log(option.title)}
               </React.Fragment>
             )}
-            style={{ width: 500 }}
+            style={{ width: "70%" }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -197,7 +218,16 @@ const AccountDetails = ({ Account }) => {
               />
             )}
           />
-          {/* {Account.preferences} */}
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            color="primary"
+            size="large"
+            className={classes.button}
+            startIcon={<SaveIcon />}
+          >
+            Save
+          </Button>
         </Typography>
         <Typography gutterBottom variant="h5" component="h2">
           saved_article: {Account.saved_article}
