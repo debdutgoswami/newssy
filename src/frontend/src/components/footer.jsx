@@ -10,14 +10,18 @@ export default function footer() {
                         <h4>Newssy</h4>
                         <ul className=" list-unstyled">
                             <li>+910000000000</li>
-                            <li>West Bengal, India</li>
-                            <li>newssy@gmail.com</li>
+                            <li>Kolkata, India</li>
+                            <li><a style={{textDecoration: "none", color: "white"}}href="mailto:newssy.app@gmail.com">newssy.app@gmail.com</a></li>
                         </ul>
                     </div>
                     <div className="col" >
-                        <ul className=" list-unstyled"></ul>
-                        <li>Reactjs</li>
-                        <li>flask</li>
+                        <h6>Tech Stack</h6>
+                        <ul className="list-unstyled">
+                        <li >Reactjs</li>
+                        <li >Flask</li>
+                        <li>GCP</li>
+                        <li>Docker</li>
+                        </ul>
                     </div>    
                 </div>
                 <hr/>

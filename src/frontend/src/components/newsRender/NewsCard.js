@@ -9,6 +9,9 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
+import Loader from 'react-loader-spinner'
+import http from '../../services/httpService'
+import {toast, ToastContainer } from 'react-toastify'
 import {
   TwitterShareButton,WhatsappShareButton,EmailShareButton,TelegramShareButton
 } from 'react-share';
@@ -30,8 +33,36 @@ const useStyles = makeStyles({
 
 export default function NewsCard({description, title, img, url, id}) {
   const classes = useStyles();
-  let desc = description.slice(0,)
+  let view = <Loader type="Audio" color="#00BFFF" height={80} width={80} />
+  const jwt = localStorage.getItem("token")
+
+  let config ={
+    headers : {
+        "x-access-token": localStorage.getItem("token")
+    }
+  }
+  const handleFavourite = () => {
+    if(jwt){
+      http.post('/api/add-article', {
+       public_id: id
+      }, config)
+
+       .then(res => {
+         if(res.status === 201){
+           toast.info("Bookmarked successfully 😍😍😍😍")
+         }else {
+           toast.info("Already saved 🤣🤣🤣🤣")
+         }
+       })
+       .catch( err => toast.error(err))
+      // window.scrollTo(0,0)
+    }
+  }
+  
+
+
   return (
+    <React.Fragment>
     <Card className={classes.root}>
       <CardActionArea>
         <CardMedia
@@ -50,7 +81,7 @@ export default function NewsCard({description, title, img, url, id}) {
       </CardActionArea>
       <CardActions disableSpacing>
         <IconButton aria-label="add to favorites">
-            <FavoriteIcon color="secondary"/>
+            <FavoriteIcon color="secondary" onClick={handleFavourite} />
         </IconButton>
         <IconButton aria-label="share">
           <TwitterShareButton
@@ -83,5 +114,7 @@ export default function NewsCard({description, title, img, url, id}) {
           </IconButton>
       </CardActions>
     </Card>
+    { window.scrollTo(0,0)}
+    </React.Fragment>
   );
 }
