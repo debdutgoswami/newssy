@@ -28,13 +28,29 @@ def profile_data(current_user):
     Response Code:
         201 -- success
     """
+    articles = current_user.saved_article
+
+    if articles:
+        saved_articles = News.query.filter(
+            News.public_id.in_(articles)
+        ).all()
+
+        articles = list()
+
+        for article in saved_articles:
+            articles.append({
+                "title" : article.title, 
+                "url" : article.url
+            })
+        
+
     responseObject = {
         'first_name'    : current_user.first_name,
         'last_name'     : current_user.last_name,
         'email'         : current_user.email,
         'joined_on'     : current_user.joined_on,
         'preferences'   : current_user.preferences,
-        'saved_article' : current_user.saved_article,
+        'saved_article' : articles,
         'email_notify'  : current_user.email_notify,
         'verified'      : current_user.VERIFIED
     }
@@ -87,11 +103,11 @@ def change_preference(current_user):
         401 -- failure
     """
 
-    preferences = request.get_json(silent=True).get('preference')
+    preferences = list(request.get_json(silent=True).get('preference'))
     try:
-        if not current_user.preferences:
-            current_user.saved_article = list()
-            db.session.commit()
+        # if not current_user.preferences:
+        #     current_user.saved_article = list()
+        #     db.session.commit()
 
         current_user.preferences = preferences
         db.session.commit()

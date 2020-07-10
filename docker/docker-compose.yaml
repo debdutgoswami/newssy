@@ -71,6 +71,7 @@ services:
         ports:
             - 5433:5433
         restart: always
+
     scraper:
         container_name: scraper
         restart: always

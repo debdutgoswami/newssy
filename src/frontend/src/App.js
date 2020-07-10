@@ -47,7 +47,7 @@ class App extends Component {
             <Route path="/not-found" component={NotFound} />
             <Route path="/profile" component={Profile} />
             <Route path="/confirm" component={Token} />
-            <Rotue path="/profile" component={Profile} />
+            <Route path="/profile" component={Profile} />
             <Redirect from="/" exact to="/news" />
             <Redirect to="/not-found" />
           </Switch>
