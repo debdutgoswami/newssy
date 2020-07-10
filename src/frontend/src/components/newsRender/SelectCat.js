@@ -14,6 +14,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { toast, ToastContainer } from "react-toastify";
 import http from "../../services/httpService"
 import auth from "../../services/authService"
+import Loader from 'react-loader-spinner'
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -88,14 +89,26 @@ export default function MultipleSelect(props) {
            per_page: 20,
            page:currentpage }, config)
     
-           .then(res => setData(res.data.articles))
+           .then(res => {
+              if(res.status === 204) {
+                toast.error("o stree kal aana")
+                setCurrentPage(1)
+                setDisabled(true)
+              }else{
+                setData(res.data.articles)  
+              }
+            
+            })
            .catch( err => {
-            if(err.response.status === 401) {
-              auth.logout()
-            }else{
+            if(err) {
+              auth.logout();
+              window.location = "/";
               toast.error(err)
-            }})
-        }else{
+            }
+              
+            })
+          }
+        else{
           if(currentpage > 1){
             toast.error("please log in to read further..");
             setCurrentPage(1)
@@ -152,6 +165,7 @@ export default function MultipleSelect(props) {
    }
    //window.scrollTo(0,0)
  }
+ 
   return (
     <div>
       <FormControl className={classes.formControl}>
@@ -218,16 +232,16 @@ export default function MultipleSelect(props) {
       spacing={10}
       styles={{padding:'10px' ,margin: '15px'}}
       >
-      {data.map(news => (
-      <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>   
-      <NewsCard 
-      description={news.body}
-      title={news.title}
-      img={news.img}
-      url={news.url}
-      id={news.public_id}
-      />
-      </Grid>  
+        {data.map(news => (
+       <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>   
+        <NewsCard 
+        description={news.body}
+        title={news.title}
+        img={news.img}
+        url={news.url}
+        id={news.public_id}
+        />
+       </Grid>  
       ))}
       </Grid>
       <br/>
