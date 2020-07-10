@@ -103,11 +103,11 @@ def change_preference(current_user):
         401 -- failure
     """
 
-    preferences = request.get_json(silent=True).get('preference')
+    preferences = list(request.get_json(silent=True).get('preference'))
     try:
-        if not current_user.preferences:
-            current_user.saved_article = list()
-            db.session.commit()
+        # if not current_user.preferences:
+        #     current_user.saved_article = list()
+        #     db.session.commit()
 
         current_user.preferences = preferences
         db.session.commit()
