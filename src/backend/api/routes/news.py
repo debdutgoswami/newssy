@@ -3,7 +3,7 @@ from flask import request, make_response
 from api import app
 
 from api.routes import api
-from api.routes.auth import token_partial_required, urlsafe
+from api.routes.auth import token_required, token_partial_required, urlsafe
 
 from api.models import db
 from api.models.users import User
@@ -93,9 +93,34 @@ def get_by_filter(current_user):
             'status' : 'success',
             'articles': responseARRAY
         }, 201)
-    except Exception as e:
-        print(e)
+    except Exception:
         return make_response({
             'status' : 'fail',
             'message': 'Page not found'
         })
+
+
+@api.route('/add-article', methods=['POST'])
+@token_required
+def add_article(current_user):
+
+    public_id = request.get_json(silent=True).get('public_id', None)
+
+    if not current_user.saved_article:
+        current_user.saved_article = list()
+        db.session.commit()
+    
+    saved_article = current_user.saved_article
+    
+    if (public_id in saved_article):
+        return make_response({
+            'status': 'fail'
+        }, 202)
+    
+    saved_article.append(public_id)
+    current_user.saved_article = saved_article
+    db.session.commit()
+
+    return make_response({
+        "status": "success"
+    }, 201)
