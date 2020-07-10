@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 axios.interceptors.response.use(null, error => {
   if( error.response && error.response.status === 401 ) {
     localStorage.removeItem("token");
-    window.location("http://localhost:3000/logout")
   }
   const expectedError =
     error.response &&
