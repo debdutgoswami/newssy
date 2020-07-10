@@ -13,7 +13,7 @@ import Button from '@material-ui/core/Button'
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { toast, ToastContainer } from "react-toastify";
 import http from "../../services/httpService"
-
+import auth from "../../services/authService"
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -89,8 +89,12 @@ export default function MultipleSelect(props) {
            page:currentpage }, config)
     
            .then(res => setData(res.data.articles))
-           .catch( err => console.log(err))
-          // window.scrollTo(0,0)
+           .catch( err => {
+            if(err.response.status === 401) {
+              auth.logout()
+            }else{
+              toast.error(err)
+            }})
         }else{
           if(currentpage > 1){
             toast.error("please log in to read further..");
@@ -105,7 +109,6 @@ export default function MultipleSelect(props) {
              })
               .then(res => setData(res.data.articles))
               .catch( err => toast.error(err))
-             // window.scrollTo(0,0)
           } 
         }
   
