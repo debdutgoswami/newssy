@@ -3,9 +3,7 @@ import logger from "./logService";
 import { toast } from "react-toastify";
 
 axios.interceptors.response.use(null, error => {
-  if( error.response && error.response.status === 401 ) {
-    localStorage.removeItem("token");
-  }
+
   const expectedError =
     error.response &&
     error.response.status >= 400 &&
