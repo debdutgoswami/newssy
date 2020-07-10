@@ -9,7 +9,7 @@ services:
         build:
             context: ../src/backend
             dockerfile: Dockerfile
-        expose:
+        expose: 
             - 5000
         command: gunicorn -w 1 -b 0.0.0.0:5000 wsgi:app
         depends_on: 
@@ -58,20 +58,29 @@ services:
     cloud-sql-proxy:
         container_name: cloud_sql_proxy
         image: gcr.io/cloudsql-docker/gce-proxy:latest
-        # Port: MySQL (3306), PostgreSQL (5432)
-        command: 
-            - /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5432 -credential_file=/config/newsfeed.json
+        # Port: MySQL (3306), PostgreSQL (5433)
+        command: /cloud_sql_proxy --dir=/cloudsql -instances=${CONNECTION_NAME}=tcp:0.0.0.0:5433 -credential_file=/config/newsfeed.json
         env_file:  
             - ".env"
         volumes:
         # this mounts your application default credential on the container, preventing the
         # 'invalid json file "/config": google: read JWT from JSON credentials: 'type' field is "authorized_user" (expected "service_account")'
         # error if you point to the actual credential file directly
-            - ../key/newsfeed.json:/secrets/cloudsql/newsfeed.json
+            - ../key:/config
             - /cloudsql:/cloudsql
         ports:
-            - 5432:5432
+            - 5433:5433
         restart: always
-        
+    scraper:
+        container_name: scraper
+        restart: always
+        build:
+            context: ../scraper
+            dockerfile: Dockerfile
+        env_file: 
+            - "../env/scraper.env"
+        command: cron -f
+        depends_on: 
+            - "cloud-sql-proxy"
 volumes: 
     redis: {}
