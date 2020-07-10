@@ -17,7 +17,7 @@ import Resend from "./components/resend";
 import Newssy from './components/newsRender/App'
 import Footer from './components/footer'
 import NavBarr from './components/navBarr'
-
+import Profile from './components/Profile'
 
 class App extends Component {
   state = {};
@@ -45,6 +45,7 @@ class App extends Component {
             <Route path="/news" component={Newssy} />
             <Route path="/resend" component={Resend} />
             <Route path="/not-found" component={NotFound} />
+            <Route path="/profile" component={Profile} />
             <Route path="/confirm" component={Token} />
             <Redirect from="/" exact to="/news" />
             <Redirect to="/not-found" />
