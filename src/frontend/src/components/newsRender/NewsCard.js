@@ -57,6 +57,9 @@ export default function NewsCard({description, title, img, url, id}) {
        .catch( err => toast.error(err))
       // window.scrollTo(0,0)
     }
+    else{
+      toast.error("Login to bookmark 😒😒")
+    }
   }
   
 
