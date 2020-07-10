@@ -57,10 +57,11 @@ export default function NewsCard({description, title, img, url, id}) {
        .catch( err => toast.error(err))
       // window.scrollTo(0,0)
     }
+    else{
+      toast.error("Login to bookmark 😒😒")
+    }
   }
   
-
-
   return (
     <React.Fragment>
     <Card className={classes.root}>
@@ -71,8 +72,8 @@ export default function NewsCard({description, title, img, url, id}) {
           title={title}
         />
         <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            <a href={url} styles={{decoration: "none"}}>{title}</a>
+          <Typography gutterBottom variant="h6" component="h2">
+            <a href={url} style={{textDecoration: "none", color:"#343A40"}}>{title}</a>
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
            {description}
