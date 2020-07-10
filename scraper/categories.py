@@ -8,8 +8,8 @@ CATEGORIES = {
 }
 
 def predict(title: str):
-    path = os.path.join(os.getcwd(), 'model')
-
+    path = os.path.join(os.path.dirname(__file__), 'model')
+    
     filename = 'finalized_model.pkl'
     vect = 'vectorizer.pkl'
     enc = 'encoder.pkl'
