@@ -7,9 +7,13 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
 import axios from 'axios';
-import ArticlesCard from './ArticlesCard'
-
-
+import NewsCard from './NewsCard'
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import { toast, ToastContainer } from "react-toastify";
+import http from "../../services/httpService"
+import auth from "../../services/authService"
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -64,17 +68,57 @@ export default function MultipleSelect(props) {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);   
   const [sourceName, setSourceName] = React.useState([]);   
+  const [ currentpage, setCurrentPage ] = React.useState(1);
+  const [ disabled, setDisabled ] = React.useState(true)
   const [data, setData ] = React.useState([])
-
+  let config ={
+    headers : {
+        "x-access-token": localStorage.getItem("token")
+    }
+  }
+  const jwt = localStorage.getItem("token")
+  
   useEffect(() => {
-       axios.post('/api/get-news', {
-        category: [...personName],
-        source: [...sourceName],
-        per_page: 20
-       })
-        .then(res => setData(res.data.articles))
-        .catch( err => console.error(err))
-  }, [personName, sourceName ])
+   async function fetchData(){
+      try {
+        if(jwt){
+          http.post('/api/get-news', {
+           category: [...personName],
+           source: [...sourceName],
+           per_page: 20,
+           page:currentpage }, config)
+    
+           .then(res => setData(res.data.articles))
+           .catch( err => {
+            if(err.response.status === 401) {
+              auth.logout()
+            }else{
+              toast.error(err)
+            }})
+        }else{
+          if(currentpage > 1){
+            toast.error("please log in to read further..");
+            setCurrentPage(1)
+          } 
+          else {
+            http.post('/api/get-news', {
+              category: [...personName],
+              source: [...sourceName],
+              per_page: 20,
+       
+             })
+              .then(res => setData(res.data.articles))
+              .catch( err => toast.error(err))
+          } 
+        }
+  
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchData()
+      
+  }, [personName, sourceName, currentpage ])
 
 
   
@@ -86,7 +130,28 @@ export default function MultipleSelect(props) {
  const OnsourceChange = e => {
    setSourceName(e.target.value)
  } 
-  console.log(personName);
+ const onPageChange = () => {
+   if ( jwt){
+     setDisabled(false)
+     setCurrentPage(currentpage +1)
+   }
+   else{
+     toast.error("please log in to read further..")
+   }
+   //window.scrollTo(0,0)
+ }
+ const onPrevious = () => {
+   if (currentpage > 2){
+      setCurrentPage(currentpage -1)  
+    }
+    
+  if(currentpage <= 2){
+    setDisabled(true)
+    setCurrentPage(currentpage -1)
+   
+   }
+   //window.scrollTo(0,0)
+ }
   return (
     <div>
       <FormControl className={classes.formControl}>
@@ -147,7 +212,29 @@ export default function MultipleSelect(props) {
           ))}
         </Select>
       </FormControl>
-      <ArticlesCard details={data}/>
+      <br/>
+      <Grid
+      container
+      spacing={10}
+      styles={{padding:'10px' ,margin: '15px'}}
+      >
+      {data.map(news => (
+      <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>   
+      <NewsCard 
+      description={news.body}
+      title={news.title}
+      img={news.img}
+      url={news.url}
+      id={news.public_id}
+      />
+      </Grid>  
+      ))}
+      </Grid>
+      <br/>
+      <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
+        <Button disabled={disabled}  onClick={onPrevious} id="abcdefg">Prev</Button>
+        <Button onClick={onPageChange} >Next</Button>
+      </ButtonGroup>
     </div>
   );
 }

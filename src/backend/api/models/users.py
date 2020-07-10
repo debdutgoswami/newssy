@@ -2,6 +2,21 @@ import datetime, uuid
 from api import bcrypt, app
 from api.models import db
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.ext.mutable import Mutable
+
+class MutableList(Mutable, list):
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableList):
+            if isinstance(value, list):
+                return MutableList(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
 
 # Database ORMs
 class User(db.Model):
@@ -16,8 +31,8 @@ class User(db.Model):
     joined_on =db.Column(db.String(30))
     name_changed_on = db.Column(db.String(30))
     admin = db.Column(db.Boolean)
-    preferences = db.Column(ARRAY(db.String(100)))
-    saved_article = db.Column(ARRAY(db.String(100)))
+    preferences = db.Column(MutableList.as_mutable(ARRAY(db.String(100))))
+    saved_article = db.Column(MutableList.as_mutable(ARRAY(db.String(100))))
     email_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)
     VERIFIED = db.Column(db.Boolean) # verified tick like Twitter
