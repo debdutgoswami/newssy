@@ -1,5 +1,7 @@
 import React from 'react';
 import * as ReactBootStrap from "react-bootstrap";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import FaceIcon from '@material-ui/icons/Face';
 import {
     BrowserRouter as Router,
     Link
@@ -24,11 +26,11 @@ const NavBarr = ({ user }) => {
     </ReactBootStrap.Nav>}
    { user && <ReactBootStrap.Nav>
     <Link to="/profile">
-    <ReactBootStrap.Nav.Link href="/profile">{user.name}</ReactBootStrap.Nav.Link>
+    <ReactBootStrap.Nav.Link href="/profile"><FaceIcon/></ReactBootStrap.Nav.Link>
     </Link>
     <Link to="/logout">
     <ReactBootStrap.Nav.Link eventKey={2} href="/logout">
-        Logout
+        <ExitToAppIcon/> Logout
       </ReactBootStrap.Nav.Link>
     </Link>
     </ReactBootStrap.Nav>}
