@@ -2,7 +2,7 @@
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import { withStyles } from "@material-ui/core/styles";
@@ -15,8 +15,14 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-
+import Chip from "@material-ui/core/Chip";
+import Box from "@material-ui/core/Box";
+import CloseIcon from "@material-ui/icons/Close";
 import SaveIcon from "@material-ui/icons/Save";
+import { Link } from "@material-ui/core";
+import Fab from "@material-ui/core/Fab";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import { Redirect } from "react-router-dom";
 
 // const useStyles = makeStyles({
 //   root: {
@@ -30,6 +36,12 @@ import SaveIcon from "@material-ui/icons/Save";
 const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
+  },
+  margin: {
+    margin: theme.spacing(1),
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
   },
 }));
 
@@ -89,25 +101,29 @@ const IOSSwitch = withStyles((theme) => ({
   );
 });
 
-const news = async ({ Account }) => {
-  const notifyCall = apiurl + "/change-preference";
+async function save(arr) {
+  const notifyCall = apiurl.apiUrl + "/change-preference";
   const response = await axios
-    .get(notifyCall, {
-      headers: {
-        "x-access-token": localStorage.getItem("token"),
-      },
+    .put(
+      notifyCall,
+      { preference: arr },
+      {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      }
+    )
+    .then((res) => {
+      window.location = "/profile";
     })
     .catch((err) => {
-      Account.preferences = err.response.status;
-      console.log(err.response.status);
+      console.log(err);
     });
   try {
-    Account.preferences = response;
-    console.log(Account.preferences);
-  } catch (error) {
-    console.log(error);
-  }
-};
+    const profile = response;
+    console.log(profile);
+  } catch (error) {}
+}
 
 const AccountDetails = ({ Account }) => {
   const apiEndpoint = apiurl.apiUrl + "/email-notification";
@@ -117,26 +133,29 @@ const AccountDetails = ({ Account }) => {
     checked: Account.email_notify,
   });
   var arr = [];
-  arr = Account.preferences;
+  // arr = Account.preferences;
+  var i = 0;
 
-  const [save, setSave] = useState(arr);
-  console.log(save);
-  const handleSave = async (event) => {
-    console.log({});
+  const handleSave = async () => {
+    let x = 0;
+    var i;
+    for (i = 0; i < 4; i++) {
+      if (categories[i].status === true) {
+        arr[x++] = categories[i].title;
+      }
+    }
+    save(arr);
+
+    arr = [];
   };
 
-  // const [button, setButton] = useState({
-  //   checked: Account.email_notify,
-  // });
-  const handleChange = async (event) => {
-    setButton({ checked: event.target.checked });
-
-    const notify = button.checked;
-
+  async function HandleNews(event) {
+    console.log(event);
+    const notifyCall = apiurl.apiUrl + "/delete-saved-article";
     const response = await axios
       .put(
-        apiEndpoint,
-        { email_notify: !notify },
+        notifyCall,
+        { preference: event.public_id },
         {
           headers: {
             "x-access-token": localStorage.getItem("token"),
@@ -147,18 +166,45 @@ const AccountDetails = ({ Account }) => {
         window.location = "/profile";
       })
       .catch((err) => {
-        // console.log(err);
+        console.log(err);
       });
     try {
       const profile = response;
       console.log(profile);
     } catch (error) {}
-  };
+  }
+  useEffect(() => {
+    async function fetchData() {
+      const notify = button.checked;
+      try {
+        await axios
+          .put(
+            apiEndpoint,
+            { email_notify: notify },
+            {
+              headers: {
+                "x-access-token": localStorage.getItem("token"),
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res);
+            // setButton(res.datat)
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, [button.checked]);
   const categories = [
-    { title: "Science and Technology" },
-    { title: "Business" },
-    { title: "Entertainment" },
-    { title: "Health" },
+    { title: "Science and Technology", status: false },
+    { title: "Business", status: false },
+    { title: "Health", status: false },
+    { title: "Entertainment", status: false },
   ];
 
   return (
@@ -170,27 +216,34 @@ const AccountDetails = ({ Account }) => {
         <Typography gutterBottom variant="h5" component="h2">
           Email: {Account.email}
         </Typography>
+
         <Typography gutterBottom variant="h5" component="h2">
-          Joined on: {Account.joined_on}
-        </Typography>
-        <Typography gutterBottom variant="h5" component="h2">
-          email_notify:{"            "}
+          Email Subscription:{"            "}
           <FormControlLabel
             control={
               <IOSSwitch
                 checked={button.checked}
-                onChange={handleChange}
+                onChange={(event) => {
+                  setButton({ checked: event.target.checked });
+                }}
                 name="checked"
               />
             }
           />
+          {console.log(button.checked)}
         </Typography>
+
         <Typography gutterBottom variant="h5" component="h2">
-          Preferences:
+          Preferences: &nbsp;
+          {Account.email_notify &&
+            Account.preferences &&
+            Account.preferences.map((item) => (
+              <Chip clickable color="primary" label={item} />
+            ))}
           <Autocomplete
             multiple
             id="checkboxes-tags-demo"
-            disabled={!Account.email_notify}
+            disabled={!button.checked}
             options={categories}
             disableCloseOnSelect
             getOptionLabel={(option) => option.title}
@@ -202,16 +255,28 @@ const AccountDetails = ({ Account }) => {
                   style={{ marginRight: 8 }}
                   checked={selected}
                 />
-                {console.log(selected)}
-                if(selected) setSave(option.title)
-                {option.title}
                 {console.log(option.title)}
+                {console.log(selected)}
+                {option.title}
+                {(categories[i++].status = selected)}
+                {(i === 4 && (i = 0)) || null}
               </React.Fragment>
             )}
+            renderTags={(tagValue, getTagProps) =>
+              tagValue.map((option, index) => (
+                <Chip
+                  color="primary"
+                  label={option.title}
+                  {...getTagProps({ index })}
+                  disabled="true"
+                />
+              ))
+            }
             style={{ width: "70%" }}
             renderInput={(params) => (
               <TextField
                 {...params}
+                label="Fixed tag"
                 variant="outlined"
                 label="Newspaper"
                 placeholder="Favorites"
@@ -230,7 +295,29 @@ const AccountDetails = ({ Account }) => {
           </Button>
         </Typography>
         <Typography gutterBottom variant="h5" component="h2">
-          saved_article: {Account.saved_article}
+          <Autocomplete
+            id="combo-box-demo"
+            options={Account.saved_article}
+            getOptionLabel={(option) => option.title}
+            renderOption={(option) => (
+              <React.Fragment>
+                <a
+                  style={{ textDecoration: "none", width: "100%" }}
+                  href={option.url}
+                >
+                  {option.title}
+                </a>
+
+                <Button onClick={() => HandleNews(option)}>
+                  <DeleteForeverIcon />
+                </Button>
+              </React.Fragment>
+            )}
+            style={{ width: "70%" }}
+            renderInput={(params) => (
+              <TextField {...params} label="Saved Article" variant="outlined" />
+            )}
+          />
         </Typography>
       </CardContent>
     </Card>
