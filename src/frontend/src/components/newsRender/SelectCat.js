@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -6,30 +6,31 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Chip from "@material-ui/core/Chip";
-import axios from 'axios';
-import NewsCard from './NewsCard'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
-import ButtonGroup from '@material-ui/core/ButtonGroup';
+import axios from "axios";
+import NewsCard from "./NewsCard";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { toast, ToastContainer } from "react-toastify";
-import http from "../../services/httpService"
-import auth from "../../services/authService"
+import http from "../../services/httpService";
+import auth from "../../services/authService";
+import configUri from "../../config.json";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
-    maxWidth: 500
+    maxWidth: 500,
   },
   chips: {
-    display: "flex"
+    display: "flex",
   },
   chip: {
-    margin: 2
+    margin: 2,
   },
   noLabel: {
-    marginTop: theme.spacing(3)
-  }
+    marginTop: theme.spacing(3),
+  },
 }));
 
 const ITEM_HEIGHT = 48;
@@ -38,20 +39,20 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250
-    }
-  }
+      width: 250,
+    },
+  },
 };
 
 const names = ["Science and Technology", "Health", "Business", "Entertainment"];
-const sources = ["BBC News", "times of india"]
+const sources = ["BBC News", "times of india"];
 
 function getStyles(name, personName, theme) {
   return {
     fontWeight:
       personName.indexOf(name) === -1
         ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium
+        : theme.typography.fontWeightMedium,
   };
 }
 function getStyles1(sources, sourceName, theme) {
@@ -59,99 +60,98 @@ function getStyles1(sources, sourceName, theme) {
     fontWeight:
       sourceName.indexOf(sources) === -1
         ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium
+        : theme.typography.fontWeightMedium,
   };
 }
 
 export default function MultipleSelect(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);   
-  const [sourceName, setSourceName] = React.useState([]);   
-  const [ currentpage, setCurrentPage ] = React.useState(1);
-  const [ disabled, setDisabled ] = React.useState(true)
-  const [data, setData ] = React.useState([])
-  let config ={
-    headers : {
-        "x-access-token": localStorage.getItem("token")
-    }
-  }
-  const jwt = localStorage.getItem("token")
-  
+  const [personName, setPersonName] = React.useState([]);
+  const [sourceName, setSourceName] = React.useState([]);
+  const [currentpage, setCurrentPage] = React.useState(1);
+  const [disabled, setDisabled] = React.useState(true);
+  const [data, setData] = React.useState([]);
+  let config = {
+    headers: {
+      "x-access-token": localStorage.getItem("token"),
+    },
+  };
+  const jwt = localStorage.getItem("token");
+
   useEffect(() => {
-   async function fetchData(){
+    async function fetchData() {
       try {
-        if(jwt){
-          http.post('/api/get-news', {
-           category: [...personName],
-           source: [...sourceName],
-           per_page: 20,
-           page:currentpage }, config)
-    
-           .then(res => setData(res.data.articles))
-           .catch( err => {
-            if(err.response.status === 401) {
-              auth.logout()
-            }else{
-              toast.error(err)
-            }})
-        }else{
-          if(currentpage > 1){
+        if (jwt) {
+          http
+            .post(
+              configUri.apiUrl + "/get-news",
+              {
+                category: [...personName],
+                source: [...sourceName],
+                per_page: 20,
+                page: currentpage,
+              },
+              config
+            )
+
+            .then((res) => setData(res.data.articles))
+            .catch((err) => {
+              if (err.response.status === 401) {
+                auth.logout();
+              } else {
+                toast.error(err);
+              }
+            });
+        } else {
+          if (currentpage > 1) {
             toast.error("please log in to read further..");
-            setCurrentPage(1)
-          } 
-          else {
-            http.post('/api/get-news', {
-              category: [...personName],
-              source: [...sourceName],
-              per_page: 20,
-       
-             })
-              .then(res => setData(res.data.articles))
-              .catch( err => toast.error(err))
-          } 
+            setCurrentPage(1);
+          } else {
+            http
+              .post(configUri.apiUrl + "/get-news", {
+                category: [...personName],
+                source: [...sourceName],
+                per_page: 20,
+              })
+              .then((res) => setData(res.data.articles))
+              .catch((err) => toast.error(err));
+          }
         }
-  
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     }
-    fetchData()
-      
-  }, [personName, sourceName, currentpage ])
+    fetchData();
+  }, [personName, sourceName, currentpage]);
 
-
-  
-
- const handleChange = event => {
+  const handleChange = (event) => {
     setPersonName(event.target.value);
   };
 
- const OnsourceChange = e => {
-   setSourceName(e.target.value)
- } 
- const onPageChange = () => {
-   if ( jwt){
-     setDisabled(false)
-     setCurrentPage(currentpage +1)
-   }
-   else{
-     toast.error("please log in to read further..")
-   }
-   //window.scrollTo(0,0)
- }
- const onPrevious = () => {
-   if (currentpage > 2){
-      setCurrentPage(currentpage -1)  
+  const OnsourceChange = (e) => {
+    setSourceName(e.target.value);
+  };
+  const onPageChange = () => {
+    if (jwt) {
+      setDisabled(false);
+      setCurrentPage(currentpage + 1);
+    } else {
+      toast.error("please log in to read further..");
     }
-    
-  if(currentpage <= 2){
-    setDisabled(true)
-    setCurrentPage(currentpage -1)
-   
-   }
-   //window.scrollTo(0,0)
- }
+    //window.scrollTo(0,0)
+  };
+  const onPrevious = () => {
+    if (currentpage > 2) {
+      setCurrentPage(currentpage - 1);
+    }
+
+    if (currentpage <= 2) {
+      setDisabled(true);
+      setCurrentPage(currentpage - 1);
+    }
+    //window.scrollTo(0,0)
+  };
   return (
     <div>
       <FormControl className={classes.formControl}>
@@ -163,16 +163,16 @@ export default function MultipleSelect(props) {
           value={personName}
           onChange={handleChange}
           input={<Input id="select-multiple-chip" />}
-          renderValue={selected => (
+          renderValue={(selected) => (
             <div className={classes.chips}>
-              {selected.map(value => (
+              {selected.map((value) => (
                 <Chip key={value} label={value} className={classes.chip} />
               ))}
             </div>
           )}
           MenuProps={MenuProps}
         >
-          {names.map(name => (
+          {names.map((name) => (
             <MenuItem
               key={name}
               value={name}
@@ -182,8 +182,8 @@ export default function MultipleSelect(props) {
             </MenuItem>
           ))}
         </Select>
-        </FormControl>
-        <FormControl className={classes.formControl}>
+      </FormControl>
+      <FormControl className={classes.formControl}>
         <InputLabel id="demo-mutipl-chip-label">Sources</InputLabel>
         <Select
           labelId="demo-mutipl-chip-label"
@@ -192,16 +192,16 @@ export default function MultipleSelect(props) {
           value={sourceName}
           onChange={OnsourceChange}
           input={<Input id="select-multipl-chip" />}
-          renderValue={selected => (
+          renderValue={(selected) => (
             <div className={classes.chips}>
-              {selected.map(value => (
+              {selected.map((value) => (
                 <Chip key={value} label={value} className={classes.chip} />
               ))}
             </div>
           )}
           MenuProps={MenuProps}
         >
-          {sources.map(source => (
+          {sources.map((source) => (
             <MenuItem
               key={source}
               value={source}
@@ -212,28 +212,30 @@ export default function MultipleSelect(props) {
           ))}
         </Select>
       </FormControl>
-      <br/>
-      <Grid
-      container
-      spacing={10}
-      styles={{padding:'10px' ,margin: '15px'}}
-      >
-      {data.map(news => (
-      <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>   
-      <NewsCard 
-      description={news.body}
-      title={news.title}
-      img={news.img}
-      url={news.url}
-      id={news.public_id}
-      />
-      </Grid>  
-      ))}
+      <br />
+      <Grid container spacing={10} styles={{ padding: "10px", margin: "15px" }}>
+        {data.map((news) => (
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <NewsCard
+              description={news.body}
+              title={news.title}
+              img={news.img}
+              url={news.url}
+              id={news.public_id}
+            />
+          </Grid>
+        ))}
       </Grid>
-      <br/>
-      <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
-        <Button disabled={disabled}  onClick={onPrevious} id="abcdefg">Prev</Button>
-        <Button onClick={onPageChange} >Next</Button>
+      <br />
+      <ButtonGroup
+        variant="text"
+        color="primary"
+        aria-label="text primary button group"
+      >
+        <Button disabled={disabled} onClick={onPrevious} id="abcdefg">
+          Prev
+        </Button>
+        <Button onClick={onPageChange}>Next</Button>
       </ButtonGroup>
     </div>
   );

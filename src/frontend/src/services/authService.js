@@ -1,11 +1,9 @@
 import jwtDecode from "jwt-decode";
 import http from "./httpService";
 import { apiUrl } from "../config.json";
-import { useHistory } from "react-router-dom";
 
 const apiEndpoint = apiUrl + "/login";
 const tokenKey = "token";
-const history = useHistory();
 
 http.setJwt(getJwt());
 
@@ -20,19 +18,17 @@ export function loginWithJwt(jwt) {
 
 export function logout() {
   localStorage.removeItem(tokenKey);
-  history.push("/")
 }
 
 export function isLoggedIn() {
   try {
     const jwt = localStorage.getItem(tokenKey);
-    if (jwt){
+    if (jwt) {
       return true;
-    }else {
+    } else {
       return false;
     }
-  }
-  catch (e) {
+  } catch (e) {
     return false;
   }
 }
@@ -47,7 +43,6 @@ export function getCurrentUser() {
 }
 
 export function getJwt() {
-
   return localStorage.getItem(tokenKey);
 }
 
@@ -57,5 +52,5 @@ export default {
   logout,
   getCurrentUser,
   getJwt,
-  isLoggedIn
+  isLoggedIn,
 };

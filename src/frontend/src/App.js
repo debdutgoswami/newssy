@@ -14,10 +14,10 @@ import news from "./components/news";
 import Token from "./components/TokenVerify";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Resend from "./components/resend";
-import Newssy from './components/newsRender/App'
-import Footer from './components/footer'
-import NavBarr from './components/navBarr'
-import Profile from './components/Profile'
+import Newssy from "./components/newsRender/App";
+import Footer from "./components/footer";
+import NavBarr from "./components/navBarr";
+import Profile from "./components/Profile";
 
 class App extends Component {
   state = {};
@@ -31,30 +31,30 @@ class App extends Component {
     const { user } = this.state;
 
     return (
-        <div className="page-container">
-          <div className="content-wrap">
-        <ToastContainer autoClose={4000} />
-        <CssBaseline />
-        {/* <NavBar user={user} /> */}
-        <NavBarr user={user}/>
-        <main className="container">
-          <Switch>
-            <Route path="/signup" component={RegisterForm} />
-            <Route path="/login" component={LoginForm} />
-            <Route path="/logout" component={Logout} />
-            <Route path="/news" component={Newssy} />
-            <Route path="/resend" component={Resend} />
-            <Route path="/not-found" component={NotFound} />
-            <Route path="/confirm" component={Token} />
-            <Rotue path="/profile" component={Profile} />
-            <Redirect from="/" exact to="/news" />
-            <Redirect to="/not-found" />
-          </Switch>
-        </main>
+      <div className="page-container">
+        <div className="content-wrap">
+          <ToastContainer autoClose={4000} />
+          <CssBaseline />
+          {/* <NavBar user={user} /> */}
+          <NavBarr user={user} />
+          <main className="container">
+            <Switch>
+              <Route path="/signup" component={RegisterForm} />
+              <Route path="/login" component={LoginForm} />
+              <Route path="/logout" component={Logout} />
+              <Route path="/news" component={Newssy} />
+              <Route path="/resend" component={Resend} />
+              <Route path="/not-found" component={NotFound} />
+              <Route path="/confirm" component={Token} />
+              <Route path="/profile" component={Profile} />
+              <Redirect from="/" exact to="/news" />
+              <Redirect to="/not-found" />
+            </Switch>
+          </main>
         </div>
-        <br/>
-        <Footer/>
-        </div>
+        <br />
+        <Footer />
+      </div>
     );
   }
 }
