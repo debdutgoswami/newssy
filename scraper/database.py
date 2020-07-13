@@ -6,8 +6,6 @@ from sqlalchemy.orm import sessionmaker
 
 from secrets_db import URI
 
-PATH_TO_DB = os.path.join(os.getcwd(), 'app', 'database', 'newsfeed.db')
-
 engine = create_engine(URI,echo=True)
 Session = sessionmaker(bind=engine)
 
@@ -29,9 +27,6 @@ class News(Base):
 
     def __repr__(self):
         return f"<News(title={self.title}, source={self.source}, lastupdated={self.lastupdated})>"
-
-#news = Table('news', metadata, autoload=True, autoload_with=engine)
-
 
 def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, body: str, img_url: str, category: str):
     session = Session()

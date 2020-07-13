@@ -97,7 +97,7 @@ def get_by_filter(current_user):
         return make_response({
             'status' : 'fail',
             'message': 'Page not found'
-        })
+        }, 204)
 
 
 @api.route('/add-article', methods=['POST'])

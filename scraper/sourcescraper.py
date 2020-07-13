@@ -13,41 +13,52 @@ def scraper_timesofindia():
 
     s = requests.Session()
 
-    html = s.get(url,headers={'User-Agent': 'Mozilla/5.0'}).text
+    for i in range(1, 4):
+        if i==1:
+            html = s.get(url,headers={'User-Agent': 'Mozilla/5.0'}).text
+        else:
+            html = s.get(url+f"/{i}",headers={'User-Agent': 'Mozilla/5.0'}).text
 
-    soup = BeautifulSoup(html, 'html.parser')
-    tags = soup.find_all('li')
+        tags = BeautifulSoup(html, 'html.parser').find('ul', {'class': "cvs_wdt clearfix"}).find_all('li')
 
-    for tag in tags:
-        tmp = tag.find('a')
+        for tag in tags:
+            anchor = tag.find('a')
+            title = anchor['title']
+            category = predict(title)
+            art_url = BASE + anchor['href']
+            short_desc = tag.select("#li:nth-child(3) > span.w_desc")
+            print(short_desc, i)
 
-        try:
-            url_new = tmp['href']
-        except:
-            url_new = None
+    # for tag in tags:
+    #     tmp = tag.find('a')
 
-        if url_new and url_new.startswith('/') and url_new.endswith('.cms'):
-            article_url = BASE+url_new
+    #     try:
+    #         url_new = tmp['href']
+    #     except:
+    #         url_new = None
 
-            with s.get(article_url, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
-                country = url_new.split('/')[1]
+    #     if url_new and url_new.startswith('/') and url_new.endswith('.cms'):
+    #         article_url = BASE+url_new
 
-                sp = BeautifulSoup(newstry.text, 'html.parser')
+    #         with s.get(article_url, headers={'User-Agent': 'Mozilla/5.0'}) as newstry:
+    #             country = url_new.split('/')[1]
 
-                try:
-                    title = sp.find('h1').text
+    #             sp = BeautifulSoup(newstry.text, 'html.parser')
 
-                    if country!='world' or country!='india':
-                        country = 'india'
+    #             try:
+    #                 title = sp.find('h1').text
 
-                    category = predict(title)
+    #                 if country!='world' or country!='india':
+    #                     country = 'india'
 
-                    addToNews(
-                        country, title, article_url, 'Times of India',
-                        datetime.datetime.utcnow(), category
-                    )
-                except AttributeError:
-                    continue
+    #                 category = predict(title)
+
+    #                 addToNews(
+    #                     country, title, article_url, 'Times of India',
+    #                     datetime.datetime.utcnow(), category
+    #                 )
+    #             except AttributeError:
+    #                 continue
 
 def scraper_bbc():
     WIDTH = 800

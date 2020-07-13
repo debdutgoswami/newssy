@@ -79,8 +79,11 @@ export default function NewsCard({ description, title, img, url, id }) {
         <CardActionArea>
           <CardMedia className={classes.media} image={img} title={title} />
           <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              <a href={url} styles={{ decoration: "none" }}>
+            <Typography gutterBottom variant="h6" component="h2">
+              <a
+                href={url}
+                style={{ textDecoration: "none", color: "#343A40" }}
+              >
                 {title}
               </a>
             </Typography>

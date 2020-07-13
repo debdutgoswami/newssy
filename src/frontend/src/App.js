@@ -45,8 +45,9 @@ class App extends Component {
               <Route path="/news" component={Newssy} />
               <Route path="/resend" component={Resend} />
               <Route path="/not-found" component={NotFound} />
-              <Route path="/confirm" component={Token} />
               <Route path="/profile" component={Profile} />
+              <Route path="/confirm" component={Token} />
+
               <Redirect from="/" exact to="/news" />
               <Redirect to="/not-found" />
             </Switch>

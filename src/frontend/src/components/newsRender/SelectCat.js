@@ -14,6 +14,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import { toast, ToastContainer } from "react-toastify";
 import http from "../../services/httpService";
 import auth from "../../services/authService";
+import Loader from "react-loader-spinner";
 import configUri from "../../config.json";
 
 const useStyles = makeStyles((theme) => ({
@@ -95,11 +96,19 @@ export default function MultipleSelect(props) {
               config
             )
 
-            .then((res) => setData(res.data.articles))
-            .catch((err) => {
-              if (err.response.status === 401) {
-                auth.logout();
+            .then((res) => {
+              if (res.status === 204) {
+                toast.error("o stree kal aana");
+                setCurrentPage(1);
+                setDisabled(true);
               } else {
+                setData(res.data.articles);
+              }
+            })
+            .catch((err) => {
+              if (err) {
+                auth.logout();
+                window.location = "/";
                 toast.error(err);
               }
             });

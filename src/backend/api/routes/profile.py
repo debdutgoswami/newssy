@@ -28,13 +28,30 @@ def profile_data(current_user):
     Response Code:
         201 -- success
     """
+    articles = current_user.saved_article
+
+    if articles:
+        saved_articles = News.query.filter(
+            News.public_id.in_(articles)
+        ).all()
+
+        articles = list()
+
+        for article in saved_articles:
+            articles.append({
+                "public_id" : article.public_id,
+                "title" : article.title, 
+                "url" : article.url
+            })
+        
+
     responseObject = {
         'first_name'    : current_user.first_name,
         'last_name'     : current_user.last_name,
         'email'         : current_user.email,
         'joined_on'     : current_user.joined_on,
         'preferences'   : current_user.preferences,
-        'saved_article' : current_user.saved_article,
+        'saved_article' : articles,
         'email_notify'  : current_user.email_notify,
         'verified'      : current_user.VERIFIED
     }
@@ -87,11 +104,11 @@ def change_preference(current_user):
         401 -- failure
     """
 
-    preferences = request.get_json(silent=True).get('preference')
+    preferences = list(request.get_json(silent=True).get('preference'))
     try:
-        if not current_user.preferences:
-            current_user.saved_article = list()
-            db.session.commit()
+        # if not current_user.preferences:
+        #     current_user.saved_article = list()
+        #     db.session.commit()
 
         current_user.preferences = preferences
         db.session.commit()
@@ -109,6 +126,41 @@ def change_preference(current_user):
         }
 
         return make_response(jsonify(responseObject), 401)
+
+@api.route('/delete-saved-article', methods=['PUT'])
+@token_required
+def delete_preference(current_user):
+    """Delete saved article
+
+    PUT
+
+    Args:
+        current_user ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    preference = request.get_json(silent=True).get('preference')
+    try:
+        saved = list(current_user.saved_article)
+        if saved and preference not in saved:
+            return make_response({
+                'status': "fail",
+                'message': "article not saved"
+            }, 203)
+        saved.remove(preference)
+        current_user.saved_article = saved
+        db.session.commit()
+
+        return make_response({
+            'status' : "success",
+            'message': "article deleted"
+        }, 201)
+    except Exception:
+        return make_response({
+            'status' : 'fail',
+            'message': 'unknown error occured'
+        },403)
 
 @api.route('/email-notification', methods=['PUT'])
 @token_required
