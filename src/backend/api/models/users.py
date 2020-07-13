@@ -31,7 +31,7 @@ class User(db.Model):
     joined_on =db.Column(db.String(30))
     name_changed_on = db.Column(db.String(30))
     admin = db.Column(db.Boolean)
-    preferences = db.Column(db.String(100))
+    preferences = db.Column(ARRAY(db.String(100)))
     saved_article = db.Column(MutableList.as_mutable(ARRAY(db.String(100))))
     email_notify = db.Column(db.Boolean)
     confirmed = db.Column(db.Boolean)

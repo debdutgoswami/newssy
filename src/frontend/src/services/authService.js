@@ -23,13 +23,12 @@ export function logout() {
 export function isLoggedIn() {
   try {
     const jwt = localStorage.getItem(tokenKey);
-    if (jwt){
+    if (jwt) {
       return true;
-    }else {
+    } else {
       return false;
     }
-  }
-  catch (e) {
+  } catch (e) {
     return false;
   }
 }
@@ -44,7 +43,6 @@ export function getCurrentUser() {
 }
 
 export function getJwt() {
-
   return localStorage.getItem(tokenKey);
 }
 
@@ -54,5 +52,5 @@ export default {
   logout,
   getCurrentUser,
   getJwt,
-  isLoggedIn
+  isLoggedIn,
 };
