@@ -69,3 +69,15 @@ We will be using a postgresql. Follow this [documentation](https://cloud.google.
                 -credential_file={service_account_key} &</pre>
 
 7. Now, create the tables. To create the tables, simply export the environment variables and then type the following in your terminal. <pre>python manage.py create_db</pre>
+
+### Production
+
+Simply create `env`, `key`, `certs` folder. Add all the `.env` files inside `env` folder, add the `service account key` to `key` folder and add the certificates to the `certs` folder. The last one is optional (if you want ssl certificate). 
+
+Make a folder inside `docker` called `cloudsql` and give it read and write permission using chmod. Also create a `.env` file which will contain the database's connection name. Don't forget to create a database in `Cloud SQL`
+
+Go inside `docker` folder and simply run `./run_docker.sh` and your server should be up and running. Don't forget to change your servers firewall settings to allow `http` and `https` connections.
+
+### Creating SSL certificate with letsencrypt (last step)
+
+To install letsencrypt vertificates with docker-compose, you need to use the letsencrypt docker image. Follow this [guide](https://www.humankode.com/ssl/how-to-set-up-free-ssl-certificates-from-lets-encrypt-using-docker-and-nginx) to get started.
