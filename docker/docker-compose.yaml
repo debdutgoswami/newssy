@@ -29,7 +29,7 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - /home/ubuntu/ssl/news.blog.aniketmitra.me:/etc/nginx/certs
+            - ../certs:/etc/nginx/certs
         depends_on: 
             - "backend"
 
