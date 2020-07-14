@@ -1,4 +1,4 @@
-from flask import request,make_response, jsonify, url_for
+from flask import request, make_response, jsonify, url_for
 import uuid, jwt, datetime
 from functools import wraps
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -10,7 +10,7 @@ from api.models.users import User
 from api.email.tasks import deliver_email
 
 
-urlsafe = URLSafeTimedSerializer(app.config.get('SECRET_KEY'))
+urlsafe = URLSafeTimedSerializer(app.config.get("SECRET_KEY"))
 
 # checking whether loged-in or not based on that info, data is provided
 def token_required(f):
@@ -18,23 +18,24 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
 
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+        if "x-access-token" in request.headers:
+            token = request.headers["x-access-token"]
 
         if not token:
-            return jsonify({'message' : 'Token is missing!!'}), 401
+            return jsonify({"message": "Token is missing!!"}), 401
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = User.query.filter_by(public_id=data['public_id']).first()
+            data = jwt.decode(token, app.config["SECRET_KEY"])
+            current_user = User.query.filter_by(public_id=data["public_id"]).first()
         except:
-            return jsonify({'message' : 'Token is invalid!!'}), 401
+            return jsonify({"message": "Token is invalid!!"}), 401
 
-        return  f(current_user, *args, **kwargs)
+        return f(current_user, *args, **kwargs)
 
     return decorated
 
-# partially protecting news route so that 
+
+# partially protecting news route so that
 # only authenticated users can access
 # page more than 1 or per page articles more than 20
 def token_partial_required(f):
@@ -42,44 +43,44 @@ def token_partial_required(f):
     def decorated(*args, **kwargs):
         token = None
         data = request.get_json(silent=True)
-        page = data.get('page', 1)
-        per_page = data.get('per_page', 20)
+        page = data.get("page", 1)
+        per_page = data.get("per_page", 20)
 
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+        if "x-access-token" in request.headers:
+            token = request.headers["x-access-token"]
 
         if not token and (page > 1 or per_page > 20):
-            return jsonify({'message' : 'Token is missing!!'}), 401
+            return jsonify({"message": "Token is missing!!"}), 401
 
         try:
             if not token:
                 current_user = None
             else:
-                data = jwt.decode(token, app.config['SECRET_KEY'])
-                current_user = User.query\
-                    .filter_by(public_id=data['public_id'])\
-                    .first()
+                data = jwt.decode(token, app.config["SECRET_KEY"])
+                current_user = User.query.filter_by(public_id=data["public_id"]).first()
         except:
-            return jsonify({'message' : 'Token is invalid!!'}), 401
+            return jsonify({"message": "Token is invalid!!"}), 401
 
-        return  f(current_user, *args, **kwargs)
+        return f(current_user, *args, **kwargs)
 
     return decorated
 
+
 def send_confirmation_token(email: str, name: str):
     # token
-    token = urlsafe.dumps(email, salt='email-confirm')
+    token = urlsafe.dumps(email, salt="email-confirm")
     # email queue
-    deliver_email.delay(
-        template='confirmation.html',
-        subject='IMPORTANT: EMAIL CONFIRMATION',
+    deliver_email(
+        template="confirmation.html",
+        subject="IMPORTANT: EMAIL CONFIRMATION",
         name=name,
         email=email,
-        link=f"http://{app.config['PUBLIC_DOMAIN']}/confirm?token={token}"
+        link=f"http://{app.config['PUBLIC_DOMAIN']}/confirm?token={token}",
     )
 
+
 # signup route
-@api.route('/signup', methods=['POST'])
+@api.route("/signup", methods=["POST"])
 def signup():
     """User Signup
 
@@ -96,7 +97,12 @@ def signup():
     """
     data = request.get_json(silent=True)
 
-    fname, lname, email, password = data.get('fname'), data.get('lname'), data.get('email'), data.get('password')
+    fname, lname, email, password = (
+        data.get("fname"),
+        data.get("lname"),
+        data.get("email"),
+        data.get("password"),
+    )
 
     user = User.query.filter_by(email=email).first()
 
@@ -106,38 +112,36 @@ def signup():
             send_confirmation_token(email, fname)
             # database ORM object
             user = User(
-                first_name=fname,
-                last_name=lname,
-                email=email,
-                password=password
+                first_name=fname, last_name=lname, email=email, password=password
             )
             # insert user
             db.session.add(user)
             db.session.commit()
 
             responseObject = {
-                'status': 'success',
-                'message': 'Successfully registered.'
+                "status": "success",
+                "message": "Successfully registered.",
             }
 
             return make_response(jsonify(responseObject), 201)
         except Exception:
             responseObject = {
-                'satus': 'fail',
-                'message': 'Some error occured. Please try again.'
+                "satus": "fail",
+                "message": "Some error occured. Please try again.",
             }
 
             return make_response(jsonify(responseObject), 401)
     else:
         responseObject = {
-            'status': 'fail',
-            'message': 'User already exists. Please Log in.'
+            "status": "fail",
+            "message": "User already exists. Please Log in.",
         }
 
         return make_response(jsonify(responseObject), 202)
 
+
 # resend confirmation email
-@api.route('/sendconfirmation', methods=['POST'])
+@api.route("/sendconfirmation", methods=["POST"])
 def resend_confirmation():
     """Resend Confirmation
     
@@ -151,31 +155,25 @@ def resend_confirmation():
         202 -- fail
         502 -- some error occured
     """
-    email = request.get_json(silent=True).get('email')
+    email = request.get_json(silent=True).get("email")
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        return make_response({
-            'status' : 'fail',
-            'message': 'User does not exist'
-        }, 202)
+        return make_response({"status": "fail", "message": "User does not exist"}, 202)
 
     try:
 
         send_confirmation_token(email, user.fname)
 
-        return make_response({
-            'status' : 'success',
-            'message': 'Check your email'
-        }, 201)
+        return make_response({"status": "success", "message": "Check your email"}, 201)
     except:
-        return make_response({
-            'status' : 'fail',
-            'message': 'Some error occured. Try again!!'
-        }, 502)
+        return make_response(
+            {"status": "fail", "message": "Some error occured. Try again!!"}, 502
+        )
+
 
 # verification of token for email confirmation
-@api.route('/confirm', methods=['POST'])
+@api.route("/confirm", methods=["POST"])
 def confirm():
     """Email Confirmation (dynamic url)
 
@@ -188,56 +186,48 @@ def confirm():
         402 -- fail (token expired / bad signature) note: read from responseObject message
     """
 
-    token = request.get_json(silent=True).get('token', None)
+    token = request.get_json(silent=True).get("token", None)
 
     try:
-        email = urlsafe.loads(token, salt='email-confirm', max_age=3600)
+        email = urlsafe.loads(token, salt="email-confirm", max_age=3600)
         user = User.query.filter_by(email=email).first()
 
         if user and not user.confirmed:
-            user.confirmed=True
+            user.confirmed = True
             # commiting changes to db
             db.session.commit()
 
             responseObject = {
-                'status': 'success',
-                'message': 'Email successfully confirmed'
+                "status": "success",
+                "message": "Email successfully confirmed",
             }
 
             return make_response(jsonify(responseObject), 201)
 
         elif user.confirmed:
-            responseObject = {
-                'status' : 'fail',
-                'message': 'User already confirmed'
-            }
+            responseObject = {"status": "fail", "message": "User already confirmed"}
             return make_response(responseObject, 203)
 
         else:
-            responseObject = {
-            'status': 'fail',
-            'message': 'Email doesnot exist'
-            }
+            responseObject = {"status": "fail", "message": "Email doesnot exist"}
 
             return make_response(jsonify(responseObject), 202)
 
     except SignatureExpired:
         responseObject = {
-            'status': 'fail',
-            'message': 'The token has expired!! Please generate a new token'
+            "status": "fail",
+            "message": "The token has expired!! Please generate a new token",
         }
 
         return make_response(jsonify(responseObject), 402)
     except BadSignature:
-        responseObject = {
-            'status': 'fail',
-            'message': 'Invalid Token'
-        }
+        responseObject = {"status": "fail", "message": "Invalid Token"}
 
         return make_response(jsonify(responseObject), 402)
 
+
 # forgot password
-@api.route('/forgotpassword', methods=['POST'])
+@api.route("/forgotpassword", methods=["POST"])
 def forgotpassword():
     """Forgot Password
 
@@ -249,45 +239,40 @@ def forgotpassword():
         402 -- fail (unknown error. Try again!)
         403 -- fail (user does not exist)
     """
-    email = request.get_json(silent=True).get('email')
+    email = request.get_json(silent=True).get("email")
 
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        responseObject = {
-            'status': 'fail',
-            'message': 'Email doesnot exist!'
-        }
+        responseObject = {"status": "fail", "message": "Email doesnot exist!"}
         return make_response(jsonify(responseObject), 403)
 
     try:
         name = user.first_name
         # token
-        token = urlsafe.dumps(email, salt='password-reset')
+        token = urlsafe.dumps(email, salt="password-reset")
         # email queue
-        deliver_email.delay(
-            template='reset.html',
-            subject='IMPORTANT: Password Reset',
+        deliver_email(
+            template="reset.html",
+            subject="IMPORTANT: Password Reset",
             name=name,
             email=email,
-            link=f"http://{app.config['PUBLIC_DOMAIN']}/api/reset/{token}"
+            link=f"http://{app.config['PUBLIC_DOMAIN']}/api/reset/{token}",
         )
 
-        responseObject = {
-            'status': 'success',
-            'message': 'Email successfully sent'
-        }
+        responseObject = {"status": "success", "message": "Email successfully sent"}
 
         return make_response(jsonify(responseObject), 201)
     except Exception:
         responseObject = {
-            'status': 'fail',
-            'message': 'Some error occured!! Try again!!'
+            "status": "fail",
+            "message": "Some error occured!! Try again!!",
         }
         return make_response(jsonify(responseObject), 402)
 
+
 # verification of token for forgot password option
-@api.route('/reset/<token>', methods=['PUT'])
+@api.route("/reset/<token>", methods=["PUT"])
 def forgotpassword_reset(token):
     """Password Reset (dynamic url)
 
@@ -301,50 +286,45 @@ def forgotpassword_reset(token):
         402 -- fail (token expired / bad signature) note: read from responseObject message
     """
     try:
-        email = urlsafe.loads(token, salt='password-reset', max_age=3600)
+        email = urlsafe.loads(token, salt="password-reset", max_age=3600)
         user = User.query.filter_by(email=email).first()
 
         if user:
 
-            password = request.get_json(silent=True).get('password')
+            password = request.get_json(silent=True).get("password")
             # salting and hashing password
             user.password = bcrypt.generate_password_hash(
-                password, app.config.get('BCRYPT_LOG_ROUNDS')
+                password, app.config.get("BCRYPT_LOG_ROUNDS")
             ).decode()
             # commiting changes to db
             db.session.commit()
 
             responseObject = {
-                'status': 'success',
-                'message': 'Password successfully changed'
+                "status": "success",
+                "message": "Password successfully changed",
             }
 
             return make_response(jsonify(responseObject), 201)
 
         else:
-            responseObject = {
-                'status': 'fail',
-                'message': 'Email doesnot exist'
-            }
+            responseObject = {"status": "fail", "message": "Email doesnot exist"}
 
             return make_response(jsonify(responseObject), 202)
 
     except SignatureExpired:
         responseObject = {
-            'status': 'fail',
-            'message': 'The token has expired!! Please try again my reseting your password'
+            "status": "fail",
+            "message": "The token has expired!! Please try again my reseting your password",
         }
 
         return make_response(jsonify(responseObject), 402)
     except BadSignature:
-        responseObject = {
-            'status': 'fail',
-            'message': 'Invalid Token'
-        }
+        responseObject = {"status": "fail", "message": "Invalid Token"}
 
         return make_response(jsonify(responseObject), 402)
 
-@api.route('/login', methods=['POST'])
+
+@api.route("/login", methods=["POST"])
 def login():
     """Login
 
@@ -360,33 +340,33 @@ def login():
     """
     auth = request.get_json(silent=True)
 
-    if not auth or not auth.get('email') or not auth.get('password'):
-        return make_response('Could not verify', 401)
+    if not auth or not auth.get("email") or not auth.get("password"):
+        return make_response("Could not verify", 401)
 
-    user = User.query.filter_by(email=auth.get('email')).first()
+    user = User.query.filter_by(email=auth.get("email")).first()
 
     if not user:
-        return make_response('Could not verify', 401)
+        return make_response("Could not verify", 401)
 
-    if bcrypt.check_password_hash(user.password, auth.get('password')):
+    if bcrypt.check_password_hash(user.password, auth.get("password")):
         if not user.confirmed:
-            return make_response(jsonify({
-                'status': 'fail',
-                'message': 'Confirm your email!!'
-            }), 402)
+            return make_response(
+                jsonify({"status": "fail", "message": "Confirm your email!!"}), 402
+            )
         if user.BANNED:
-            return make_response({
-                'status' : 'fail',
-                'message': 'USER BANNED!!'
-            }, 403)
+            return make_response({"status": "fail", "message": "USER BANNED!!"}, 403)
 
-        token = jwt.encode({
-            'public_id': user.public_id, 
-            'name': user.first_name, 
-            'email': user.email, 
-            'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-        }, app.config['SECRET_KEY'])
+        token = jwt.encode(
+            {
+                "public_id": user.public_id,
+                "name": user.first_name,
+                "email": user.email,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
+            },
+            app.config["SECRET_KEY"],
+        )
 
-        return make_response({'token' : token.decode('UTF-8')}, 201)
+        return make_response({"token": token.decode("UTF-8")}, 201)
 
-    return make_response('Could not verify', 401)
+    return make_response("Could not verify", 401)
+
