@@ -1,6 +1,6 @@
 # Newssy
 
-An all-in-one news portal where anyone can look through news from various sources and even subscribe to news letters to receive daily headlines via email.
+An all-in-one news portal where anyone can look through news from various sources and even subscribe to newsletters to receive daily headlines via email.
 
 ---
 
