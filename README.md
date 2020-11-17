@@ -1,12 +1,12 @@
-# Newsfeed
+# Newssy
+
+An all-in-one news portal where anyone can look through news from various sources and even subscribe to news letters to receive daily headlines via email.
 
 ---
 
 ## Contributing
 
-1. Check [CODE OF CONDUCT](https://github.com/debdutgoswami/newsfeed/blob/master/CODE_OF_CONDUCT.md) to know how to setup your `development` enviornment.
-
-2. All PRs should be merged to `development` branch. So always change to `development` branch.
+1. All PRs should be merged to `development` branch. So always change to `development` branch.
 
 ---
 
