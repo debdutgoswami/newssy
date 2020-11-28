@@ -1,7 +1,6 @@
 from flask import Flask, Blueprint, request
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 
 from api.models import db
 from api.email import mail
@@ -13,7 +12,6 @@ import os
 app = Flask(
     __name__, template_folder=os.path.join(os.getcwd(), "api", "email", "templates")
 )
-CORS(app)
 
 app.config.from_object(os.environ["APP_SETTINGS"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

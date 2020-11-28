@@ -1,4 +1,19 @@
-# Newsfeed
+<p align="center">
+    <img src="assets/favicon.png" width="300px" alt="Logo" >
+    <h3 align="center">Newssy</h3>
+    <br />
+    <p align="center">
+      One Stop News for all 📰
+      <br />
+      <br />
+      Look through News from various sources and subscribe to newsletters to receive daily headlines via email
+      <br />
+      <br />
+      <a href="https://github.com/debdutgoswami/newsfeed/issues/new?assignees=&labels=&template=bug_report_template.md&title=">Report Bug</a>
+      ·
+      <a href="https://github.com/debdutgoswami/newsfeed/issues/new?assignees=&labels=&template=feature_request_template.md&title=">Request Feature</a>
+    </p>
+</p>
 
 ---
 
@@ -46,6 +61,8 @@
 2. Start the service by typing `service redis-server start`
 
 3. (optional) Connect to redis via redis-cli, type `redis-cli` then type `ping` in the cli
+
+---
 
 Deployment (Google Cloud Platform)
 ======
