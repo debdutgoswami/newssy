@@ -29,7 +29,7 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - /home/ubuntu/ssl/news.blog.aniketmitra.me:/etc/nginx/certs
+            - ../certs:/etc/nginx/certs
         depends_on: 
             - "backend"
 
@@ -71,27 +71,6 @@ services:
         ports:
             - 5433:5433
         restart: always
-    
-    task:
-        image: strm/tasker
-        volumes: 
-            - "/var/run/docker.sock:/var/run/docker.sock"
-        environment: 
-            configuration: |
-                schedule:
-                    - every: hour
-                      task: scraper
-                tasks:
-                    docker:
-                        - name: scraper
-                          build:
-                              context: ../scraper
-                              dockerfile: Dockerfile
-                          env_file: 
-                              - "../env/scraper.env"
-                          script: python sourcescraper.py
-                        
-                          depends_on: 
-                              - "cloud-sql-proxy"
+
 volumes: 
     redis: {}
