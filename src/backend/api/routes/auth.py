@@ -1,21 +1,26 @@
-from flask import request, make_response, jsonify, url_for
-import uuid, jwt, datetime
 from functools import wraps
+import datetime
+import jwt
+from flask import request, make_response, jsonify
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-
-from api import app, bcrypt
-from api.routes import api
-from api.models import db
-from api.models.users import User
-from api.email.tasks import deliver_email
-
+from .. import app, bcrypt
+from ..email.tasks import deliver_email
+from ..models import db
+from ..models.users import User
+from ..routes import api
 
 urlsafe = URLSafeTimedSerializer(app.config.get("SECRET_KEY"))
+
 
 # checking whether loged-in or not based on that info, data is provided
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        """
+        Not checking whether the user has confirmed the email because
+        access token won't be issued if the user is not verified.
+        """
+
         token = None
 
         if "x-access-token" in request.headers:
@@ -41,15 +46,23 @@ def token_required(f):
 def token_partial_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        """
+        Not checking whether the user has confirmed the email because
+        access token won't be issued if the user is not verified.
+        """
+
         token = None
         data = request.get_json(silent=True)
         page = data.get("page", 1)
         per_page = data.get("per_page", 20)
 
         if "x-access-token" in request.headers:
-            token = request.headers["x-access-token"]
+            token = request.headers.get("x-access-token")
 
         if not token and (page > 1 or per_page > 20):
+            # Checks if user is requesting for any page other than first page or
+            # whether the user is requesting for more than 20 articles in a single page
+
             return jsonify({"message": "Token is missing!!"}), 401
 
         try:
@@ -57,7 +70,7 @@ def token_partial_required(f):
                 current_user = None
             else:
                 data = jwt.decode(token, app.config["SECRET_KEY"])
-                current_user = User.query.filter_by(public_id=data["public_id"]).first()
+                current_user = User.query.filter_by(public_id=data.get("public_id")).first()
         except:
             return jsonify({"message": "Token is invalid!!"}), 401
 
@@ -120,7 +133,7 @@ def signup():
 
             responseObject = {
                 "status": "success",
-                "message": "Successfully registered.",
+                "message": "Successfully registered. Kindly check your mail!!",
             }
 
             return make_response(jsonify(responseObject), 201)
@@ -369,4 +382,3 @@ def login():
         return make_response({"token": token.decode("UTF-8")}, 201)
 
     return make_response("Could not verify", 401)
-

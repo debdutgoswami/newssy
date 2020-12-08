@@ -1,15 +1,16 @@
-import sqlalchemy, os, uuid
+import sqlalchemy
+import uuid
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.dialects.postgresql import BYTEA, REAL
 from sqlalchemy.orm import sessionmaker
 
 from secrets_db import URI
 
-engine = create_engine(URI,echo=True)
+engine = create_engine(URI, echo=True)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
+
 
 class News(Base):
     __tablename__ = 'news'
@@ -28,22 +29,24 @@ class News(Base):
     def __repr__(self):
         return f"<News(title={self.title}, source={self.source}, lastupdated={self.lastupdated})>"
 
-def addToNews(country: str, title: str, url:str, source: str, lastupdated: str, body: str, img_url: str, category: str):
+
+def addToNews(country: str, title: str, url: str, source: str, lastupdated: str, body: str, img_url: str,
+              category: str):
     session = Session()
 
     try:
         news = News(
-            public_id = str(uuid.uuid4()),
-            country = country,
-            title = title,
-            url = url,
-            body = body,
-            img_url = img_url,
-            source = source,
-            lastupdated = lastupdated,
-            category = category
+            public_id=str(uuid.uuid4()),
+            country=country,
+            title=title,
+            url=url,
+            body=body,
+            img_url=img_url,
+            source=source,
+            lastupdated=lastupdated,
+            category=category
         )
-    
+
         session.add(news)
         session.commit()
     except sqlalchemy.exc.IntegrityError:

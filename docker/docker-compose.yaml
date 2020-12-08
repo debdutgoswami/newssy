@@ -1,3 +1,5 @@
+# TODO: create a cron job container for running the scrapper periodically (along with newsletter)
+
 version: '3'
 
 services:
@@ -24,7 +26,7 @@ services:
             dockerfile: Dockerfile
         environment:
             - SKIP_PREFLIGHT_CHECK=true 
-            - SERVER_NAME=news.blog.aniketmitra.me
+            - SERVER_NAME=newssy.debdut.live
         ports: 
             - 80:80
             - 443:443

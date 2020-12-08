@@ -1,15 +1,14 @@
 from flask import request, make_response
 
-from api import app
+from .. import app
 
-from api.routes import api
-from api.routes.auth import token_required, token_partial_required, urlsafe
+from ..routes import api
+from ..routes.auth import token_required, token_partial_required
 
-from api.models import db
-from api.models.users import User
-from api.models.news import News
+from ..models import db
+from ..models.news import News
 
-from api.email.tasks import deliver_email
+
 
 def get_filter_by(category, source, country):
     """For generating suitable function parameters for querying the database
@@ -30,7 +29,7 @@ def get_filter_by(category, source, country):
         parms.append(News.source.in_(source))
     if len(country):
         parms.append(News.country.in_(country))
-    
+
     return parms
 
 
@@ -70,12 +69,12 @@ def get_by_filter(current_user):
         if len(func_parms):
             articles = News.query.filter(
                 *func_parms
-            ).order_by(News.lastupdated.desc())\
-            .paginate(page=page, per_page=per_page)
+            ).order_by(News.lastupdated.desc()) \
+                .paginate(page=page, per_page=per_page)
         else:
-            articles = News.query.order_by(News.lastupdated.desc())\
-            .paginate(page=page, per_page=per_page)
-        
+            articles = News.query.order_by(News.lastupdated.desc()) \
+                .paginate(page=page, per_page=per_page)
+
         for article in articles.items:
             responseARRAY.append({
                 'public_id': article.public_id,
@@ -90,12 +89,12 @@ def get_by_filter(current_user):
             })
 
         return make_response({
-            'status' : 'success',
+            'status': 'success',
             'articles': responseARRAY
         }, 201)
     except Exception:
         return make_response({
-            'status' : 'fail',
+            'status': 'fail',
             'message': 'Page not found'
         }, 204)
 
@@ -103,20 +102,20 @@ def get_by_filter(current_user):
 @api.route('/add-article', methods=['POST'])
 @token_required
 def add_article(current_user):
-
     public_id = request.get_json(silent=True).get('public_id', None)
 
     if not current_user.saved_article:
         current_user.saved_article = list()
         db.session.commit()
-    
+
     saved_article = current_user.saved_article
-    
-    if (public_id in saved_article):
+
+    if public_id in saved_article:
         return make_response({
-            'status': 'fail'
+            'status': 'fail',
+            'message': 'Article already saved!'
         }, 202)
-    
+
     saved_article.append(public_id)
     current_user.saved_article = saved_article
     db.session.commit()
