@@ -7,7 +7,7 @@ Flask-Bcrypt==0.7.1
 
 psycopg2-binary
 
-PyJWT==1.7.1
+PyJWT==2.4.0
 celery==4.4.2
 redis
 gunicorn==20.0.4
